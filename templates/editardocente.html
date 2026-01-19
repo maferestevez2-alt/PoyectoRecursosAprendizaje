@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Docente</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='docentes.css') }}">
+</head>
+<body>
+    <h1>Editar Docente</h1>
+
+    <form action="/actualizar/{{ docentes.id }}" method="POST">
+        <input type="text" name="no_empleado" value="{{ docentes.no_empleado }}" required>
+        <input type="text" name="nombre" value="{{ docentes.nombre }}" required>
+        <input type="text" name="apellido_paterno" value="{{ docentes.apellido_paterno }}" required>
+        <input type="text" name="apellido_materno" value="{{ docentes.apellido_materno }}" required>
+        <input type="text" name="materia" value="{{ docentes.materia }}" required>
+        <button type="submit">Guardar Cambios</button>
+    </form>
+
+    <a href="/">Regresar</a>
+</body>
+</html>

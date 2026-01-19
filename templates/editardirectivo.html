@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Directivo</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='directivos.css') }}">
+</head>
+<body>
+
+    <h1>Editar Directivo</h1>
+
+    <form action="/actualizar/{{ directivo.id }}" method="POST">
+        <input type="text" name="no_empleado" value="{{ directivo.no_empleado }}" required>
+        <input type="text" name="nombre" value="{{ directivo.nombre }}" required>
+        <input type="text" name="apellido_paterno" value="{{ directivo.apellido_paterno }}" required>
+        <input type="text" name="apellido_materno" value="{{ directivo.apellido_materno }}" required>
+        <input type="text" name="puesto" value="{{ directivo.puesto }}" required>
+        <button type="submit">Guardar</button>
+    </form>
+
+    <a href="{{ url_for('directivos') }}">Regresar</a>
+
+</body>
+</html>

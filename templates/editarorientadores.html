@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ 'Editar Orientador' if orientador else 'Agregar Orientador' }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='orintadores.css') }}">
+
+</head>
+<body class="bg-light">
+<div class="container py-5">
+  <h2>{{ 'Editar Orientador' if orientador else 'Agregar Orientador' }}</h2>
+
+  <form method="POST" class="mt-3">
+    <div class="mb-3">
+      <label>No. Empleado</label>
+      <input type="text" name="no_empleado" class="form-control" required
+             value="{{ orientador.no_empleado if orientador else '' }}">
+    </div>
+    <div class="mb-3">
+      <label>Nombre</label>
+      <input type="text" name="nombre" class="form-control" required
+             value="{{ orientador.nombre if orientador else '' }}">
+    </div>
+    <div class="mb-3">
+      <label>Apellido Paterno</label>
+      <input type="text" name="apellido_paterno" class="form-control" required
+             value="{{ orientador.apellido_paterno if orientador else '' }}">
+    </div>
+    <div class="mb-3">
+      <label>Apellido Materno</label>
+      <input type="text" name="apellido_materno" class="form-control" required
+             value="{{ orientador.apellido_materno if orientador else '' }}">
+    </div>
+    <div class="mb-3">
+      <label>Grupos Encargado</label>
+      <input type="text" name="grupos_encargado" class="form-control" required
+             value="{{ orientador.grupos_encargado if orientador else '' }}">
+    </div>
+
+    <button type="submit" class="btn btn-success">Guardar</button>
+    <a href="{{ url_for('orientadores') }}" class="btn btn-secondary">Cancelar</a>
+  </form>
+</div>
+</body>
+</html>

@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Registro | Portal Escolar</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#ffffff;
+      --blue-600:#0366d6;
+      --blue-500:#0b74ff;
+      --blue-100:#e6f0ff;
+      --muted:#6b7280;
+      --radius:12px;
+      --shadow:0 8px 30px rgba(3,22,63,0.08);
+      font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:linear-gradient(180deg,#f7fbff 0%,#ffffff 60%);
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      min-height:100vh;
+      padding:32px;
+      color:#081028;
+    }
+    .card{
+      background:var(--bg);
+      width:100%;
+      max-width:480px;
+      padding:30px;
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      border:1px solid rgba(3,22,63,0.05);
+    }
+    h1{
+      color:var(--blue-600);
+      text-align:center;
+      font-size:1.6rem;
+      margin:0 0 8px;
+    }
+    p.subtitle{
+      color:var(--muted);
+      text-align:center;
+      margin-bottom:22px;
+    }
+    label.field{display:block;margin-bottom:14px}
+    span.label-text{display:block;font-size:0.85rem;color:var(--muted);margin-bottom:6px}
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    select{
+      width:100%;
+      padding:12px 14px;
+      border-radius:10px;
+      border:1px solid rgba(3,22,63,0.08);
+      font-size:1rem;
+      outline:none;
+      transition:border-color .12s,box-shadow .12s;
+    }
+    input:focus,select:focus{
+      border-color:var(--blue-500);
+      box-shadow:0 0 0 3px rgba(11,116,255,0.1);
+    }
+    .primary-btn{
+      width:100%;
+      background:linear-gradient(90deg,var(--blue-600),var(--blue-500));
+      color:white;
+      border:none;
+      border-radius:10px;
+      padding:12px 14px;
+      font-size:1rem;
+      cursor:pointer;
+      margin-top:10px;
+      transition:transform .12s,box-shadow .12s;
+    }
+    .primary-btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(3,22,63,0.12)}
+    .success{
+      display:none;
+      background:#e6f9e8;
+      color:#1d7a2e;
+      padding:12px;
+      border-radius:var(--radius);
+      margin-top:20px;
+      animation:fadeIn .5s ease forwards;
+    }
+    @keyframes fadeIn{
+      from{opacity:0;transform:translateY(5px);}
+      to{opacity:1;transform:translateY(0);}
+    }
+    .back-link{
+      display:block;
+      text-align:center;
+      margin-top:20px;
+      text-decoration:none;
+      color:var(--blue-600);
+      font-size:0.95rem;
+    }
+    .back-link:hover{text-decoration:underline}
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h1>Crear cuenta</h1>
+    <p class="subtitle">Regístrate en el Cecytem</p>
+
+    <form id="registerForm">
+      <label class="field">
+        <span class="label-text">Nombre completo</span>
+        <input type="text" id="nombre" placeholder="Ingresa tu nombre" required>
+      </label>
+
+      <label class="field">
+        <span class="label-text">Correo electrónico</span>
+        <input type="email" id="correo" placeholder="Correo " required>
+      </label>
+
+      <label class="field">
+        <span class="label-text">Contraseña</span>
+        <input type="password" id="clave" placeholder="••••••••" required minlength="6">
+      </label>
+
+      <label class="field">
+        <span class="label-text">Tipo de usuario</span>
+        <select id="rol" required>
+          <option value="">Selecciona...</option>
+          <option value="docente">Docente</option>
+          <option value="alumno">Alumno</option>
+        </select>
+      </label>
+
+      <button type="submit" class="primary-btn">Registrarse</button>
+    </form>
+
+    <div class="success" id="msgExito">✅ Registro exitoso. ¡Bienvenido(a)!</div>
+
+    <a href="Login.html" class="back-link">← Volver al inicio de sesión</a>
+  </div>
+
+  <script>
+    const form = document.getElementById('registerForm');
+    const msg = document.getElementById('msgExito');
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const nombre = document.getElementById('nombre').value.trim();
+      const correo = document.getElementById('correo').value.trim();
+      const clave = document.getElementById('clave').value.trim();
+      const rol = document.getElementById('rol').value;
+
+      if (!nombre || !correo || !clave || !rol) {
+        alert('Por favor completa todos los campos.');
+        return;
+      }
+
+      msg.style.display = 'block';
+      form.reset();
+    });
+  </script>
+
+</body>
+</html>

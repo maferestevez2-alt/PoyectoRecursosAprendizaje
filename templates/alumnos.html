@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Alumnos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='proyecto.css') }}">
+
+</head>
+<body>
+
+<h2>Lista de Alumnos</h2>
+
+<!-- Búsqueda por texto -->
+<form action="" method="GET" class="busqueda">
+    <input type="text" name="q" id="q" placeholder="Buscar..." value="{{ query }}">
+    <button type="button" onclick="startRecognition()">🎤</button>
+    <button type="submit">Buscar</button>
+</form>
+
+
+<hr>
+
+<!-- Formulario agregar alumno -->
+<form action="/agregar" method="POST">
+    <input type="text" name="no_control" placeholder="No. Control" required>
+    <input type="text" name="curp" placeholder="CURP" required>
+    <input type="text" name="nombre" placeholder="Nombre" required>
+    <input type="text" name="apellido_paterno" placeholder="Apellido Paterno" required>
+    <input type="text" name="apellido_materno" placeholder="Apellido Materno" required>
+    <input type="text" name="grupo" placeholder="Grupo" required>
+    <input type="text" name="turno" placeholder="Turno" required>
+    <input type="text" name="semestre" placeholder="Semestre" required>
+    <button type="submit">Agregar</button>
+</form>
+
+<hr>
+
+<table>
+    <tr>
+        <th>ID</th>
+        <th>No. Control</th>
+        <th>CURP</th>
+        <th>Nombre</th>
+        <th>Apellido Paterno</th>
+        <th>Apellido Materno</th>
+        <th>Grupo</th>
+        <th>Turno</th>
+        <th>Semestre</th>
+        <th>Acciones</th>
+    </tr>
+    {% for a in alumnos %}
+    <tr>
+        <td>{{ a.id }}</td>
+        <td>{{ a.no_control }}</td>
+        <td>{{ a.curp }}</td>
+        <td>{{ a.nombre }}</td>
+        <td>{{ a.apellido_paterno }}</td>
+        <td>{{ a.apellido_materno }}</td>
+        <td>{{ a.grupo }}</td>
+        <td>{{ a.turno }}</td>
+        <td>{{ a.semestre }}</td>
+        <td>
+            <a href="/editar/{{ a.id }}">Editar</a>
+            <a href="/eliminar/{{ a.id }}" onclick="return confirm('¿Seguro?')">Eliminar</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+<!-- Web Speech API -->
+<script>
+function startRecognition() {
+    if (!('webkitSpeechRecognition' in window)) {
+        alert("Tu navegador no soporta reconocimiento de voz");
+        return;
+    }
+
+    let recognition = new webkitSpeechRecognition();
+    recognition.lang = "es-MX";
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    recognition.start();
+
+    recognition.onresult = function(event) {
+        document.getElementById("q").value = event.results[0][0].transcript;
+        document.querySelector("form.busqueda").submit();
+    };
+}
+</script>
+
+
+</body>
+</html>
+

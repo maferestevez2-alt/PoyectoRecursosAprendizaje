@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar materia</title>
+</head>
+<body>
+
+    <h1>✏ Editar materia</h1>
+
+    <form method="POST">
+        <input type="text" name="no_empleado" value="{{materia.no_empleado}}" required>
+        <input type="text" name="docente" value="{{ materia.docente }}" required>
+        <input type="text" name="materia" value="{{ materia.materia }}" required>
+        <button type="submit">Guardar cambios</button>
+    </form>
+
+    <a href="/">⬅ Regresar</a>
+
+</body>
+</html>

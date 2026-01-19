@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Recursos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='proyecto.css') }}">
+</head>
+
+<body>
+
+    <h1> Recursos</h1>
+
+    <!-- Botón de reporte general (solo para admin y directivo) -->
+    {% if rol in ['admin', 'directivo'] %}
+    <div style="margin-bottom: 20px;">
+        <a href="{{ url_for('reporte_general') }}" class="btn-reporte"
+            style="background: #b8bdbd; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: bold;">
+            Descargar Reporte General
+        </a>
+    </div>
+    {% endif %}
+
+    <!-- 🔍 BUSCAR -->
+    <form method="POST" action="/recursos">
+        <input type="text" name="busqueda" placeholder="Buscar...">
+        <button type="submit">Buscar</button>
+        <button type="button" onclick="buscarVoz()">🎤</button>
+    </form>
+
+    <h3>➕ Agregar recurso</h3>
+    <form method="POST" action="/recursos/agregar" enctype="multipart/form-data">
+        <input type="text" name="no_control" placeholder="No. de control" required>
+        <input type="date" name="fecha" required>
+        <input type="text" name="nombre" placeholder="Nombre" required>
+        <input type="text" name="estadisticas" placeholder="Estadísticas" required>
+        <input type="text" name="materia" placeholder="Materia" required>
+        <input type="text" name="tipo" placeholder="Tipo" required>
+        <label for="archivo">Archivo del recurso:</label>
+        <input type="file" name="archivo" required>
+        <button type="submit">Agregar</button>
+    </form>
+
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>No. Control</th>
+            <th>Fecha</th>
+            <th>Nombre</th>
+            <th>Estadísticas</th>
+            <th>Materia</th>
+            <th>Tipo</th>
+            <th>Acciones</th>
+        </tr>
+
+        {% for r in recursos %}
+        <tr>
+            <td>{{ r.id }}</td>
+            <td>{{ r.no_control }}</td>
+            <td>{{ r.fecha }}</td>
+            <td>{{ r.nombre }}</td>
+            <td>{{ r.estadisticas }}</td>
+            <td>{{ r.materia }}</td>
+            <td>{{ r.tipo }}</td>
+            <td>
+                <a href="/recursos/descargar/{{ r.id }}" style="color: #3498db;">📥 Descargar</a>
+                <a href="/recursos/editar/{{ r.id }}">✏ Editar</a>
+                <a href="/recursos/eliminar/{{ r.id }}" onclick="return confirm('¿Estás seguro?')">🗑 Eliminar</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <div style="margin-top: 30px;">
+        <a href="{{ url_for('menu') }}"
+            style="padding: 10px 20px; background: #95a5a6; color: white; text-decoration: none; border-radius: 5px;">←
+            Volver al menú</a>
+    </div>
+
+    <script>
+        function buscarVoz() {
+            if (!('webkitSpeechRecognition' in window)) {
+                alert("Tu navegador no soporta reconocimiento de voz");
+                return;
+            }
+
+            let reconocimiento = new webkitSpeechRecognition();
+            reconocimiento.lang = "es-MX";
+            reconocimiento.continuous = false;
+            reconocimiento.interimResults = false;
+
+            reconocimiento.start();
+
+            reconocimiento.onresult = function (event) {
+                const texto = event.results[0][0].transcript;
+                document.querySelector("input[name='busqueda']").value = texto;
+                document.querySelector("form").submit();
+            };
+        }
+    </script>
+
+</body>
+
+</html>

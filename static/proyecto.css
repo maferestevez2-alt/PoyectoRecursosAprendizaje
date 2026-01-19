@@ -1,0 +1,139 @@
+/* =============================
+   RESET BÁSICO
+==============================*/
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", sans-serif;
+}
+
+/* =============================
+   GENERAL
+==============================*/
+body {
+    background: #e6f1ff;  /* Azul muy claro */
+    color: #003366;       /* Azul oscuro */
+    padding: 20px;
+}
+
+h1, h2 {
+    text-align: center;
+    margin-bottom: 15px;
+    color: #003366;
+}
+
+/* =============================
+   FORMULARIOS
+==============================*/
+form {
+    background: #ffffff;
+    border: 2px solid #005bbb;
+    padding: 15px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 650px;
+    margin: 20px auto;
+    box-shadow: 0 0 10px rgba(0, 91, 187, 0.2);
+}
+
+form input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 12px;
+    border: 1px solid #0077dd;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+form input:focus {
+    outline: none;
+    border: 2px solid #004f9f;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    background: #005bbb;
+    border: none;
+    border-radius: 8px;
+    color: #ffffff;
+    font-size: 15px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+button:hover {
+    background: #004f9f;
+}
+
+/* =============================
+   TABLA
+==============================*/
+table {
+    width: 90%;
+    max-width: 900px;
+    margin: 20px auto;
+    border-collapse: collapse;
+    background: white;
+    border: 2px solid #005bbb;
+    box-shadow: 0 0 10px rgba(0, 91, 187, 0.2);
+}
+
+th, td {
+    padding: 12px;
+    text-align: center;
+    border: 1px solid #aad3ff;
+}
+
+th {
+    background: #005bbb;
+    color: white;
+}
+
+tr:nth-child(even) {
+    background: #e8f2ff;
+}
+
+tr:hover {
+    background: #cce4ff;
+}
+
+/* =============================
+   BOTONES EN TABLA
+==============================*/
+a {
+    text-decoration: none;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-weight: bold;
+}
+
+a:hover {
+    opacity: 0.85;
+}
+
+a[href*='editar'] {
+    background: #0077dd;
+}
+
+a[href*='eliminar'] {
+    background: #bb0000;
+}
+
+a[href*='eliminar']:hover {
+    background: #a00000;
+}
+
+/* =============================
+   BOTÓN REGRESAR
+==============================*/
+.volver {
+    display: block;
+    margin: 20px auto;
+    width: 120px;
+    text-align: center;
+    background: #0077dd;
+}
+

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Orientadores</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='proyecto.css') }}">
+
+</head>
+<body>
+
+<h2>Orientadores</h2>
+
+<!-- Búsqueda por texto -->
+<form action="" method="GET" class="busqueda">
+    <input type="text" name="q" id="q" placeholder="Buscar..." value="{{ query }}">
+    <button type="button" onclick="startRecognition()">🎤</button>
+    <button type="submit">Buscar</button>
+</form>
+
+<!-- Agregar orientador -->
+<form action="/agregar" method="POST">
+    <input type="text" name="no_empleado" placeholder="No. Empleado" required>
+    <input type="text" name="nombre" placeholder="Nombre" required>
+    <input type="text" name="apellido_paterno" placeholder="Apellido Paterno" required>
+    <input type="text" name="apellido_materno" placeholder="Apellido Materno" required>
+    <input type="text" name="grupos_encargado" placeholder="Grupos Encargado" required>
+    <button type="submit">Agregar</button>
+</form>
+
+<table>
+<tr>
+    <th>ID</th><th>No. Empleado</th><th>Nombre</th><th>Apellido Paterno</th><th>Apellido Materno</th><th>Grupos</th><th>Acciones</th>
+</tr>
+{% for o in orientadores %}
+<tr>
+    <td>{{ o.id }}</td>
+    <td>{{ o.no_empleado }}</td>
+    <td>{{ o.nombre }}</td>
+    <td>{{ o.apellido_paterno }}</td>
+    <td>{{ o.apellido_materno }}</td>
+    <td>{{ o.grupos_encargado }}</td>
+    <td>
+        <a href="/editar/{{ o.id }}">Editar</a>
+        <a href="/eliminar/{{ o.id }}" onclick="return confirm('¿Seguro?')">Eliminar</a>
+    </td>
+</tr>
+{% endfor %}
+</table>
+
+<script>
+function startRecognition() {
+    if (!('webkitSpeechRecognition' in window)) {
+        alert("Tu navegador no soporta reconocimiento de voz");
+        return;
+    }
+
+    let recognition = new webkitSpeechRecognition();
+    recognition.lang = "es-MX";
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    recognition.start();
+
+    recognition.onresult = function(event) {
+        document.getElementById("q").value = event.results[0][0].transcript;
+        document.querySelector("form.busqueda").submit();
+    };
+}
+</script>
+
+</body>
+</html>

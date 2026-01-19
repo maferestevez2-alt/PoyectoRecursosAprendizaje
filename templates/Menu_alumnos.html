@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menú Alumno</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='menu.css') }}">
+</head>
+<script>
+    let inactivityTimeout;
+    const TIMEOUT_DURATION = 60000; // 1 minute
+    function resetInactivityTimer() {
+        clearTimeout(inactivityTimeout);
+        inactivityTimeout = setTimeout(logoutDueToInactivity, TIMEOUT_DURATION);
+    }
+    function logoutDueToInactivity() {
+        fetch('/logout_inactivity', { method: 'POST' })
+            .then(() => {
+                window.location.href = '/';
+            });
+    }
+    // Track user activity
+    ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'].forEach(event => {
+        document.addEventListener(event, resetInactivityTimer, true);
+    });
+    resetInactivityTimer();
+</script>
+
+<body>
+
+    <div class="sidebar">
+        <h2>Menú Alumno</h2>
+        <ul>
+            <li><a href="/recursos">Recursos</a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <h1>Bienvenido, {{ usuario }}</h1>
+        <h3>Rol: Alumno</h3>
+
+        <div class="menu-grid">
+            <div class="menu-card"><a href="/recursos">📚 Ver Recursos</a></div>
+        </div>
+
+        <div style="text-align:center; margin-top:30px;">
+            <a href="{{ url_for('logout') }}" class="logout">Cerrar sesión</a>
+        </div>
+    </div>
+
+</body>
+
+</html>

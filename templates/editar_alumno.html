@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Editar Alumno</title>
+</head>
+<body>
+
+<h2>Editar Alumno</h2>
+
+<form action="/actualizar/{{ alumno.id }}" method="POST">
+    <input type="text" name="no_control" value="{{ alumno.no_control }}" required>
+    <input type="text" name="curp" value="{{ alumno.curp }}" required>
+    <input type="text" name="nombre" value="{{ alumno.nombre }}" required>
+    <input type="text" name="apellido_paterno" value="{{ alumno.apellido_paterno }}" required>
+    <input type="text" name="apellido_materno" value="{{ alumno.apellido_materno }}" required>
+    <input type="text" name="grupo" value="{{ alumno.grupo }}" required>
+    <input type="text" name="turno" value="{{ alumno.turno }}" required>
+    <input type="text" name="semestre" value="{{ alumno.semestre }}" required>
+    <button type="submit">Actualizar</button>
+</form>
+
+</body>
+</html>

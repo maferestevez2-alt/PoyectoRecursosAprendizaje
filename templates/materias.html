@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Materias</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='proyecto.css') }}">
+
+</head>
+<body>
+
+    <h1>📘 Materias</h1>
+
+    <!-- 🔍 BUSCAR -->
+<form action="" method="GET" class="busqueda">
+    <input type="text" name="q" id="q" placeholder="Buscar..." value="{{ query }}">
+    <button type="button" onclick="startRecognition()">🎤</button>
+    <button type="submit">Buscar</button>
+</form>
+
+    <!-- ➕ AGREGAR -->
+    <h3>Agregar materia</h3>
+    <form method="POST" action="/agregar">
+        <input type="text" name="no_empleado" placeholder="No.Empleado" required>
+        <input type="text" name="docente" placeholder="Docente" required>
+        <input type="text" name="materia" placeholder="Materia" required>
+        <button type="submit">Agregar</button>
+    </form>
+
+    <!-- 📄 TABLA -->
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>No Empleado</th>
+            <th>Docente</th>
+            <th>Materia</th>
+            <th>Acciones</th>
+        </tr>
+
+        {% for m in materias %}
+        <tr>
+            <td>{{ m.id }}</td>
+            <td>{{m.no_empleado}}</td>
+            <td>{{ m.docente }}</td>
+            <td>{{ m.materia }}</td>
+            <td>
+                <a href="/editar/{{ m.id }}"> Editar</a> 
+                <a href="/eliminar/{{ m.id }}"> Eliminar</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+
+<script>
+function startRecognition() {
+    if (!('webkitSpeechRecognition' in window)) {
+        alert("Tu navegador no soporta reconocimiento de voz");
+        return;
+    }
+
+    let recognition = new webkitSpeechRecognition();
+    recognition.lang = "es-MX";
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    recognition.start();
+
+    recognition.onresult = function(event) {
+        document.getElementById("q").value = event.results[0][0].transcript;
+        document.querySelector("form.busqueda").submit();
+    };
+}
+</script>
+
+</body>
+</html>

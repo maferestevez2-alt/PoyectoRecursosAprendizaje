@@ -1,0 +1,16 @@
+<h2>Recuperar contraseña</h2>
+    <link rel="stylesheet" href="{{ url_for('static', filename='proyecto.css') }}">
+
+
+<form method="POST">
+    <label>Usuario:</label>
+    <input type="text" name="usuario" required>
+
+    <label>Nuevo password:</label>
+    <input type="password" name="new_password" required>
+
+    <a href="{{ url_for('login') }}">Regresar</a>
+
+    <button type="submit">Actualizar contraseña</button>
+</form>
+

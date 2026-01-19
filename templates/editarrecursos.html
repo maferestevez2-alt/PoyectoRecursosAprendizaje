@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Editar recurso</title>
+</head>
+
+<body>
+
+    <h1>✏ Editar recurso</h1>
+
+    <form method="POST" enctype="multipart/form-data">
+        <input type="text" name="no_control" value="{{ recurso.no_control }}" required>
+        <input type="date" name="fecha" value="{{ recurso.fecha }}" required>
+        <input type="text" name="nombre" value="{{ recurso.nombre }}" required>
+        <input type="text" name="estadisticas" value="{{ recurso.estadisticas }}" required>
+        <input type="text" name="materia" value="{{ recurso.materia }}" required>
+        <input type="text" name="tipo" value="{{ recurso.tipo }}" required>
+
+        <label for="archivo">Archivo actual: {{ recurso.archivo }}</label><br>
+        <label for="archivo">Subir nuevo archivo (opcional):</label>
+        <input type="file" name="archivo">
+
+        <button type="submit">Guardar cambios</button>
+    </form>
+
+    <a href="/">⬅ Regresar</a>
+
+</body>
+
+</html>
