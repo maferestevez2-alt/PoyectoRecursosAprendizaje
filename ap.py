@@ -23,7 +23,7 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 conexion = mysql.connector.connect(
     host="localhost",
     user="root",
-    password="",
+    password="admin",
     database="proyecto"
 )
 
