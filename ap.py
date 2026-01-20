@@ -23,7 +23,7 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 conexion = mysql.connector.connect(
     host="localhost",
     user="root",
-    password="",
+    password="admin",
     database="proyecto"
 )
 
@@ -116,7 +116,6 @@ def login():
     if request.method == "POST":
         usuario = request.form["usuario"]
         password = request.form["password"]
-        rol = request.form["rol"]
         
         # Verificar si el usuario está bloqueado
         is_locked, minutos_restantes = check_user_lockout(usuario)
@@ -125,7 +124,8 @@ def login():
             return render_template("login.html")
 
         cursor = conexion.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM usuarios WHERE usuario=%s AND rol=%s", (usuario, rol))
+        # Buscar usuario solo por nombre de usuario (sin rol)
+        cursor.execute("SELECT * FROM usuarios WHERE usuario=%s", (usuario,))
         user = cursor.fetchone()
         cursor.close()
 
@@ -133,7 +133,7 @@ def login():
             # Login exitoso - limpiar intentos fallidos
             clear_login_attempts(usuario)
             session["usuario"] = usuario
-            session["rol"] = rol
+            session["rol"] = user["rol"]  # Obtener rol automáticamente de la base de datos
             return redirect(url_for("menu"))
         else:
             # Login fallido - registrar intento
@@ -144,7 +144,7 @@ def login():
             if is_locked:
                 flash(f"Demasiados intentos fallidos. Usuario bloqueado por {minutos_restantes} minutos.", "error")
             else:
-                flash("Usuario, contraseña o rol incorrectos", "error")
+                flash("Usuario o contraseña incorrectos", "error")
 
     return render_template("login.html")
 

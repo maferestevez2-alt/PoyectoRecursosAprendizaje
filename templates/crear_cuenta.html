@@ -1,44 +1,47 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <title>Crear Cuenta</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='proyecto.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='crear_cuenta.css') }}">
 </head>
+
 <body>
 
-<h2>Crear cuenta nueva</h2>
+    <h2>Crear cuenta nueva</h2>
 
-<form method="POST">
-    <label>Usuario:</label>
-    <input type="text" name="usuario" required>
+    <form method="POST">
+        <label>Usuario:</label>
+        <input type="text" name="usuario" required>
 
-    <label>Contraseña:</label>
-    <input type="password" name="password" required>
+        <label>Contraseña:</label>
+        <input type="password" name="password" required>
 
-    <label>Rol:</label>
-    <select name="rol" required>
-        <option value="">Selecciona</option>
-        <option value="admin">Admin</option>
-        <option value="directivo">Directivo</option>
-        <option value="orientador">Orientador</option>
-        <option value="docente">Docente</option>
-        <option value="alumno">Alumno</option>
-    </select>
+        <label>Rol:</label>
+        <select name="rol" required>
+            <option value="">Selecciona</option>
+            <option value="admin">Admin</option>
+            <option value="directivo">Directivo</option>
+            <option value="orientador">Orientador</option>
+            <option value="docente">Docente</option>
+            <option value="alumno">Alumno</option>
+        </select>
 
-    <button type="submit">Crear cuenta</button>
-    <a href="{{ url_for('login') }}">Regresar</a>
-</form>
+        <button type="submit">Crear cuenta</button>
+        <a href="{{ url_for('login') }}">Regresar</a>
+    </form>
 
-{% with messages = get_flashed_messages(with_categories=true) %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
-        <ul class="flash">
+    <ul class="flash">
         {% for category, msg in messages %}
-            <li class="{{ category }}">{{ msg }}</li>
+        <li class="{{ category }}">{{ msg }}</li>
         {% endfor %}
-        </ul>
+    </ul>
     {% endif %}
-{% endwith %}
+    {% endwith %}
 
 </body>
+
 </html>
