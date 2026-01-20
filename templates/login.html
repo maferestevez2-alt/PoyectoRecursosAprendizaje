@@ -11,7 +11,7 @@
 
 <div class="login-card">
     <div class="avatar">
-        <span>&#128100;</span>
+        <span>&#128100;</span> <!-- Icono usuario -->
     </div>
 
     <h2>Iniciar sesión</h2>
@@ -19,6 +19,14 @@
     <form method="POST" action="{{ url_for('login') }}">
         <input type="text" name="usuario" placeholder="Usuario" required>
         <input type="password" name="password" placeholder="Contraseña" required>
+        <select name="rol" required>
+            <option value="">Selecciona tu rol</option>
+            <option value="admin">Admin</option>
+            <option value="directivo">Directivo</option>
+            <option value="orintador">Orientador</option>
+            <option value="docente">Docente</option>
+            <option value="alumno">Alumno</option>
+        </select>
         <button type="submit">LOGIN</button>
     </form>
 
