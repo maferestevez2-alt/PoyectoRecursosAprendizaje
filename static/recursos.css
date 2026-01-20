@@ -1,280 +1,176 @@
-/* static/recursos.css */
-
+/* =============================
+   RESET BÁSICO
+==============================*/
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-family: "Segoe UI", sans-serif;
 }
 
+/* =============================
+   GENERAL
+==============================*/
 body {
-    font-family: 'Segoe UI', system-ui, sans-serif;
-    background-color: #f0f4f8;
-    color: #2c3e50;
-    min-height: 100vh;
-    padding: 30px 20px;
-    line-height: 1.6;
+    background: linear-gradient(
+        135deg,
+        #eaf2ff 0%,
+        #ffffff 100%
+    );
+    color: #003366;
+    padding: 20px;
 }
 
-h1 {
-    color: #2c7be5;
+h1, h2 {
     text-align: center;
-    margin-bottom: 2rem;
-    font-size: 2.2rem;
-    font-weight: 600;
+    margin-bottom: 15px;
+    color: #003366;
 }
 
-h3 {
-    color: #34495e;
-    margin: 2rem 0 1rem;
-    font-size: 1.4rem;
-    font-weight: 500;
-}
-
-/* Botón de reporte general */
-.btn-reporte {
-    background: #2c7be5 !important;
-    color: white !important;
-    padding: 12px 28px !important;
-    border-radius: 8px !important;
-    font-weight: 600 !important;
-    text-decoration: none !important;
-    display: inline-block !important;
-    transition: all 0.22s ease;
-    box-shadow: 0 3px 10px rgba(44, 123, 229, 0.18);
-}
-
-.btn-reporte:hover {
-    background: #1e69d4 !important;
-    transform: translateY(-1px);
-    box-shadow: 0 6px 15px rgba(44, 123, 229, 0.28);
-}
-
-/* Formularios de búsqueda y agregar */
+/* =============================
+    FORMULARIOS
+==============================*/
 form {
-    background: white;
-    padding: 1.8rem;
-    border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-    margin-bottom: 2.5rem;
-    max-width: 900px;
-    margin-left: auto;
-    margin-right: auto;
+    background: #ffffff;
+    border: 2px solid #005bbb;
+    padding: 18px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 650px;
+    margin: 20px auto;
+    box-shadow: 0 10px 25px rgba(68, 155, 248, 0.685);
 }
 
-form input[type="text"],
-form input[type="date"],
-form input[type="file"],
-form select {
+form input {
     width: 100%;
-    padding: 11px 14px;
-    margin-bottom: 1.1rem;
-    border: 1px solid #c3d8ff;
-    border-radius: 7px;
-    font-size: 1rem;
-    background: #fafcff;
-    transition: border-color 0.2s, box-shadow 0.2s;
+    padding: 10px;
+    margin-bottom: 12px;
+    border: 1px solid #0077dd;
+    border-radius: 6px;
+    font-size: 14px;
 }
 
-form input:focus,
-form input[type="file"]:focus {
+form input:focus {
     outline: none;
-    border-color: #2c7be5;
-    box-shadow: 0 0 0 3px rgba(44, 123, 229, 0.12);
+    border: 2px solid #003366;
 }
 
-form button,
-form button[type="submit"] {
-    background: #2c7be5;
-    color: white;
+/* BOTÓN FORM */
+button {
+    width: 30%;
+    padding: 12px;
+    background: linear-gradient(
+        135deg,
+        #005bbb,
+        #003366
+    );
     border: none;
-    padding: 12px 24px;
-    border-radius: 7px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.22s;
-}
-
-form button:hover,
-form button[type="submit"]:hover {
-    background: #1e69d4;
-    transform: translateY(-1px);
-}
-
-form button[type="button"] {
-    /* botón de micrófono */
-    background: #3498db;
-    font-size: 1.1rem;
-    padding: 11px 16px;
-    margin-left: 8px;
-}
-
-/* Búsqueda (formulario superior) */
-form[action="/recursos"] {
-    display: flex;
-    gap: 10px;
-    max-width: 600px;
-    padding: 1.2rem;
-}
-
-form[action="/recursos"] input[type="text"] {
-    flex: 1;
-    margin-bottom: 0;
-}
-
-/* Tabla */
-table {
-    width: 100%;
-    max-width: 1100px;
-    margin: 0 auto 2.5rem;
-    background: white;
     border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
-    border-collapse: collapse;
+    color: #ffffff;
+    font-size: 15px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: transform 0.2s, opacity 0.2s;
 }
 
-th,
-td {
-    padding: 14px 16px;
-    text-align: left;
-    border-bottom: 1px solid #e9f0ff;
+button:hover {
+    transform: scale(1.04);
+    opacity: 0.9;
+}
+
+/* =============================
+   TABLA
+==============================*/
+table {
+    width: 90%;
+    max-width: 900px;
+    margin: 25px auto;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 12px 30px rgba(91, 166, 247, 0.856);
+}
+
+th, td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #569ff3;
 }
 
 th {
-    background: #2c7be5;
+    background: linear-gradient(
+        135deg,
+        #005bbb,
+        #003366
+    );
     color: white;
-    font-weight: 600;
-    text-transform: uppercase;
-    font-size: 0.9rem;
-    letter-spacing: 0.4px;
+}
+
+tr:nth-child(even) {
+    background: #f1f7ff;
 }
 
 tr:hover {
-    background: #f8fbff;
+    background: #dce9ff;
 }
 
-td a {
-    margin-right: 14px;
+/* =============================
+   BOTONES EN TABLA
+==============================*/
+a {
     text-decoration: none;
-    font-weight: 500;
-    transition: color 0.2s;
-}
-
-td a[href*="descargar"] {
-    color: #27ae60;
-}
-
-td a[href*="editar"] {
-    color: #f39c12;
-}
-
-td a[href*="eliminar"] {
-    color: #e74c3c;
-}
-
-td a:hover {
-    text-decoration: underline;
-    opacity: 0.85;
-}
-
-/* Botón Volver */
-a[href*="/menu"] {
-    display: inline-block;
-    background: #3498db;
     color: white;
-    padding: 12px 24px;
+    padding: 8px 14px;
     border-radius: 8px;
-    text-decoration: none;
-    font-weight: 500;
-    transition: all 0.22s;
+    font-weight: bold;
+    display: inline-block;
+    transition: transform 0.2s, opacity 0.2s;
 }
 
-a[href*="/menu"]:hover {
-    background: #2980b9;
-    transform: translateY(-1px);
+a:hover {
+    transform: scale(1.05);
+    opacity: 0.9;
 }
 
-/* Responsivo */
-@media (max-width: 768px) {
+a[href*='editar'] {
+    background: linear-gradient(
+        135deg,
+        #0077dd,
+        #005bbb
+    );
+}
 
-    table,
-    thead,
-    tbody,
-    th,
-    td,
-    tr {
-        display: block;
-    }
+a[href*='eliminar'] {
+    background: linear-gradient(
+        135deg,
+        #e74c3c,
+        #c0392b
+    );
+}
 
-    thead tr {
-        position: absolute;
-        top: -9999px;
-        left: -9999px;
-    }
+/* =============================
+   BOTÓN REGRESAR
+==============================*/
+.volver {
+    display: block;
+    margin: 25px auto;
+    width: 140px;
+    text-align: center;
+    background: linear-gradient(
+        135deg,
+        #0077dd,
+        #549adf
+    );
+    padding: 10px;
+    border-radius: 10px;
+}
 
-    tr {
-        margin-bottom: 1.5rem;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        overflow: hidden;
-    }
+a[href*='menu' ]{
+    padding: 10px 20px; 
+    background: #192e7be2;
+    color: white; 
+    text-decoration: none; 
+    border-radius: 5px;
 
-    td {
-        border: none;
-        border-bottom: 1px solid #eee;
-        position: relative;
-        padding-left: 50%;
-    }
-
-    td:before {
-        position: absolute;
-        top: 14px;
-        left: 16px;
-        width: 45%;
-        padding-right: 10px;
-        white-space: nowrap;
-        font-weight: bold;
-        color: #34495e;
-    }
-
-    td:nth-of-type(1):before {
-        content: "ID";
-    }
-
-    td:nth-of-type(2):before {
-        content: "No. Control";
-    }
-
-    td:nth-of-type(3):before {
-        content: "Fecha";
-    }
-
-    td:nth-of-type(4):before {
-        content: "Nombre";
-    }
-
-    td:nth-of-type(5):before {
-        content: "Estadísticas";
-    }
-
-    td:nth-of-type(6):before {
-        content: "Materia";
-    }
-
-    td:nth-of-type(7):before {
-        content: "Tipo";
-    }
-
-    td:nth-of-type(8):before {
-        content: "Acciones";
-    }
-
-    form[action="/recursos"] {
-        flex-direction: column;
-    }
-
-    form[action="/recursos"] button[type="button"] {
-        margin-left: 0;
-        margin-top: 8px;
-    }
 }
