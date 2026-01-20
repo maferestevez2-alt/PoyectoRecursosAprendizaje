@@ -4,12 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menú Directivo</title>
+    <title>Menú Docente</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='menu.css') }}">
 </head>
 <script>
     let inactivityTimeout;
-    const TIMEOUT_DURATION = 60000; // 1 minute
+    const TIMEOUT_DURATION = 60000; // 1 minuto
 
     function resetInactivityTimer() {
         clearTimeout(inactivityTimeout);
@@ -23,7 +23,7 @@
             });
     }
 
-    // Track user activity
+    // Seguimiento de actividad del usuario
     ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'].forEach(event => {
         document.addEventListener(event, resetInactivityTimer, true);
     });
@@ -34,7 +34,13 @@
 <body>
 
     <div class="sidebar">
-        <h2>Menú Directivo</h2>
+        <!-- Perfil con inicial -->
+        <div class="profile-initial">
+            <div class="initial">{{ usuario[0]|upper }}</div>
+            <h3>{{ usuario }}</h3>
+            <p>Docente</p>
+        </div>
+
         <ul>
             <li><a href="/alumnos">Alumnos</a></li>
             <li><a href="/docentes">Docentes</a></li>
@@ -47,7 +53,7 @@
 
     <div class="main-content">
         <h1>Bienvenido, {{ usuario }}</h1>
-        <h3>Rol: Directivo</h3>
+        <h3>Rol: Docente</h3>
 
         <div class="menu-grid">
             <div class="menu-card"><a href="/alumnos">Alumnos</a></div>

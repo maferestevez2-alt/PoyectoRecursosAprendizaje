@@ -12,8 +12,12 @@
    GENERAL
 ==============================*/
 body {
-    background: #e6f1ff;  /* Azul muy claro */
-    color: #003366;       /* Azul oscuro */
+    background: linear-gradient(
+        135deg,
+        #eaf2ff 0%,
+        #ffffff 100%
+    );
+    color: #003366;
     padding: 20px;
 }
 
@@ -24,17 +28,17 @@ h1, h2 {
 }
 
 /* =============================
-   FORMULARIOS
+    FORMULARIOS
 ==============================*/
 form {
     background: #ffffff;
     border: 2px solid #005bbb;
-    padding: 15px;
-    border-radius: 10px;
+    padding: 18px;
+    border-radius: 12px;
     width: 90%;
     max-width: 650px;
     margin: 20px auto;
-    box-shadow: 0 0 10px rgba(0, 91, 187, 0.2);
+    box-shadow: 0 10px 25px rgba(0, 91, 187, 0.25);
 }
 
 form input {
@@ -42,29 +46,36 @@ form input {
     padding: 10px;
     margin-bottom: 12px;
     border: 1px solid #0077dd;
-    border-radius: 5px;
+    border-radius: 6px;
     font-size: 14px;
 }
 
 form input:focus {
     outline: none;
-    border: 2px solid #004f9f;
+    border: 2px solid #003366;
 }
 
+/* BOTÓN FORM */
 button {
     width: 100%;
     padding: 12px;
-    background: #005bbb;
+    background: linear-gradient(
+        135deg,
+        #005bbb,
+        #003366
+    );
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     color: #ffffff;
     font-size: 15px;
     cursor: pointer;
     font-weight: bold;
+    transition: transform 0.2s, opacity 0.2s;
 }
 
 button:hover {
-    background: #004f9f;
+    transform: scale(1.04);
+    opacity: 0.9;
 }
 
 /* =============================
@@ -73,30 +84,35 @@ button:hover {
 table {
     width: 90%;
     max-width: 900px;
-    margin: 20px auto;
+    margin: 25px auto;
     border-collapse: collapse;
     background: white;
-    border: 2px solid #005bbb;
-    box-shadow: 0 0 10px rgba(0, 91, 187, 0.2);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 12px 30px rgba(0, 91, 187, 0.25);
 }
 
 th, td {
     padding: 12px;
     text-align: center;
-    border: 1px solid #aad3ff;
+    border-bottom: 1px solid #cce4ff;
 }
 
 th {
-    background: #005bbb;
+    background: linear-gradient(
+        135deg,
+        #005bbb,
+        #003366
+    );
     color: white;
 }
 
 tr:nth-child(even) {
-    background: #e8f2ff;
+    background: #f1f7ff;
 }
 
 tr:hover {
-    background: #cce4ff;
+    background: #dce9ff;
 }
 
 /* =============================
@@ -105,25 +121,32 @@ tr:hover {
 a {
     text-decoration: none;
     color: white;
-    padding: 8px 12px;
-    border-radius: 6px;
+    padding: 8px 14px;
+    border-radius: 8px;
     font-weight: bold;
+    display: inline-block;
+    transition: transform 0.2s, opacity 0.2s;
 }
 
 a:hover {
-    opacity: 0.85;
+    transform: scale(1.05);
+    opacity: 0.9;
 }
 
 a[href*='editar'] {
-    background: #0077dd;
+    background: linear-gradient(
+        135deg,
+        #0077dd,
+        #005bbb
+    );
 }
 
 a[href*='eliminar'] {
-    background: #bb0000;
-}
-
-a[href*='eliminar']:hover {
-    background: #a00000;
+    background: linear-gradient(
+        135deg,
+        #e74c3c,
+        #c0392b
+    );
 }
 
 /* =============================
@@ -131,9 +154,14 @@ a[href*='eliminar']:hover {
 ==============================*/
 .volver {
     display: block;
-    margin: 20px auto;
-    width: 120px;
+    margin: 25px auto;
+    width: 140px;
     text-align: center;
-    background: #0077dd;
+    background: linear-gradient(
+        135deg,
+        #0077dd,
+        #003366
+    );
+    padding: 10px;
+    border-radius: 10px;
 }
-

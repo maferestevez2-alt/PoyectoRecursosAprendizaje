@@ -1,16 +1,35 @@
-<h2>Recuperar contraseña</h2>
-    <link rel="stylesheet" href="{{ url_for('static', filename='directivos.css') }}">
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Recuperar contraseña</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='recuperar_contrasena.css') }}">
+</head>
+<body>
 
+    <h2>Recuperar contraseña</h2>
 
-<form method="POST">
-    <label>Usuario:</label>
-    <input type="text" name="usuario" required>
+    <form method="POST">
+        <label>Usuario</label>
+        <input type="text" name="usuario" required>
 
-    <label>Nuevo password:</label>
-    <input type="password" name="new_password" required>
+        <label>Nueva contraseña</label>
+        <input type="password" name="password" required>
 
-    <a href="{{ url_for('login') }}">Regresar</a>
+        <button type="submit">Actualizar contraseña</button>
+    </form>
 
-    <button type="submit">Actualizar contraseña</button>
-</form>
+    <a href="{{ url_for('login') }}">← Volver al login</a>
 
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="flash">
+          {% for category, message in messages %}
+            <li class="{{ category }}">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+</body>
+</html>

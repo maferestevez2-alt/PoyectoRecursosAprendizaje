@@ -9,7 +9,7 @@
 </head>
 <script>
     let inactivityTimeout;
-    const TIMEOUT_DURATION = 60000; // 1 minute
+    const TIMEOUT_DURATION = 60000; // 1 minuto
     function resetInactivityTimer() {
         clearTimeout(inactivityTimeout);
         inactivityTimeout = setTimeout(logoutDueToInactivity, TIMEOUT_DURATION);
@@ -20,7 +20,7 @@
                 window.location.href = '/';
             });
     }
-    // Track user activity
+    // Seguimiento de actividad del usuario
     ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'].forEach(event => {
         document.addEventListener(event, resetInactivityTimer, true);
     });
@@ -30,7 +30,13 @@
 <body>
 
     <div class="sidebar">
-        <h2>Menú Alumno</h2>
+        <!-- Perfil de usuario -->
+        <div class="profile">
+            <img src="{{ url_for('static', filename='perfil.png') }}" alt="Foto de perfil">
+            <h3>{{ usuario }}</h3>
+            <p>Alumno</p>
+        </div>
+
         <ul>
             <li><a href="/recursos">Recursos</a></li>
         </ul>

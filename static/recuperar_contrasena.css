@@ -1,0 +1,97 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #005bbb, #e6f1ff);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+h2 {
+    color: #003366;
+    margin-bottom: 20px;
+}
+
+form {
+    background: white;
+    padding: 30px;
+    width: 100%;
+    max-width: 380px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 91, 187, 0.3);
+}
+
+label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: bold;
+    color: #003366;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #0077dd;
+    border-radius: 6px;
+}
+
+input:focus {
+    outline: none;
+    border: 2px solid #005bbb;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    background: #005bbb;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #003366;
+}
+
+a {
+    margin-top: 15px;
+    color: #005bbb;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* FLASH */
+.flash {
+    list-style: none;
+    margin-top: 15px;
+}
+
+.flash li {
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 8px;
+}
+
+.flash .success {
+    background: #cce4ff;
+    color: #003366;
+}
+
+.flash .error {
+    background: #ffcccc;
+    color: #a10000;
+}

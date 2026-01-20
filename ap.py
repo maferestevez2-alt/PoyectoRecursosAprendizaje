@@ -23,7 +23,7 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 conexion = mysql.connector.connect(
     host="localhost",
     user="root",
-    password="admin",
+    password="",
     database="proyecto"
 )
 
@@ -175,22 +175,26 @@ def crear_cuenta():
 def recuperar_contrasena():
     if request.method == "POST":
         usuario = request.form["usuario"]
-        new_password = request.form["new_password"]
+        nueva_password = request.form["password"]
 
-        cursor = conexion.cursor()
+        cursor = conexion.cursor(dictionary=True)
         cursor.execute("SELECT * FROM usuarios WHERE usuario=%s", (usuario,))
-        if cursor.fetchone():
-            cursor.execute("UPDATE usuarios SET password=%s WHERE usuario=%s", (new_password, usuario))
+        user = cursor.fetchone()
+
+        if user:
+            cursor.execute(
+                "UPDATE usuarios SET password=%s WHERE usuario=%s",
+                (nueva_password, usuario)
+            )
             conexion.commit()
-            flash("Contraseña actualizada correctamente", "info")
             cursor.close()
+            flash("Contraseña actualizada correctamente", "success")
             return redirect(url_for("login"))
         else:
-            flash("El usuario no existe", "error")
             cursor.close()
+            flash("El usuario no existe", "error")
 
     return render_template("recuperar_contrasena.html")
-
 
 @app.route("/menu")
 def menu():

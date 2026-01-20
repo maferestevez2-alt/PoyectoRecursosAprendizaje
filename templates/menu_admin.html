@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Administrador</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
+
+</head>
+<body>
+
+<header>
+    <h2>Panel del Administrador</h2>
+
+    <div class="profile">
+        <div class="avatar">
+            {{ session['usuario'][0]|upper }}
+        </div>
+
+        <div class="profile-info">
+            <strong>{{ session['usuario'] }}</strong><br>
+            <small>{{ session['rol'] | capitalize }}</small>
+        </div>
+
+        <a href="{{ url_for('logout') }}" class="logout">Salir</a>
+    </div>
+</header>
+
+<div class="container">
+    <div class="grid">
+
+        <div class="card">
+            <h3>Alumnos</h3>
+            <p>Gestión de alumnos</p>
+            <a href="{{ url_for('alumnos') }}">Entrar</a>
+        </div>
+
+        <div class="card">
+            <h3>Docentes</h3>
+            <p>Gestión de docentes</p>
+            <a href="{{ url_for('docentes') }}">Entrar</a>
+        </div>
+
+        <div class="card">
+            <h3>Orientadores</h3>
+            <p>Gestión de orientadores</p>
+            <a href="{{ url_for('orientadores') }}">Entrar</a>
+        </div>
+
+        <div class="card">
+            <h3>Directivos</h3>
+            <p>Gestión de directivos</p>
+            <a href="{{ url_for('directivos') }}">Entrar</a>
+        </div>
+
+        <div class="card">
+            <h3>Materias</h3>
+            <p>Administrar materias</p>
+            <a href="{{ url_for('materias') }}">Entrar</a>
+        </div>
+
+        <div class="card">
+            <h3>Recursos</h3>
+            <p>Recursos del sistema</p>
+            <a href="{{ url_for('recursos') }}">Entrar</a>
+        </div>
+
+        <div class="card">
+            <h3>Reporte General</h3>
+            <p>Descargar reporte PDF</p>
+            <a href="{{ url_for('reporte_general') }}">Generar</a>
+        </div>
+
+        <div class="card">
+            <h3>Usuarios</h3>
+            <p>Crear cuentas y asignar roles</p>
+            <a href="{{ url_for('crear_cuenta') }}">Administrar</a>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>

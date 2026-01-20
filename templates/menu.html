@@ -9,7 +9,13 @@
 <body>
 
 <div class="sidebar">
-    <h2>Menú Admin</h2>
+    <!-- Perfil de usuario -->
+    <div class="profile">
+        <img src="{{ url_for('static', filename='perfil.png') }}" alt="Foto de perfil">
+        <h3>{{ usuario }}</h3>
+        <p>Administrador</p>
+    </div>
+
     <ul>
         <li><a href="/alumnos">Alumnos</a></li>
         <li><a href="/docentes">Docentes</a></li>
