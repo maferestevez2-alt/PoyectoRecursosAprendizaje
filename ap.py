@@ -129,7 +129,7 @@ def login():
         user = cursor.fetchone()
         cursor.close()
 
-        if user and user["password"] == password:
+        if user and user["password"] == password: 
             # Login exitoso - limpiar intentos fallidos
             clear_login_attempts(usuario)
             session["usuario"] = usuario
@@ -641,42 +641,40 @@ def recursos():
         busqueda = request.form["busqueda"]
         cursor.execute("""
             SELECT * FROM recursos 
-            WHERE no_control LIKE %s 
-            OR nombre LIKE %s
+            WHERE nombre LIKE %s
             OR materia LIKE %s
             OR tipo LIKE %s
-        """, (f"%{busqueda}%", f"%{busqueda}%", f"%{busqueda}%", f"%{busqueda}%"))
+        """, (f"%{busqueda}%", f"%{busqueda}%", f"%{busqueda}%"))
     else:
         cursor.execute("SELECT * FROM recursos")
 
     recursos = cursor.fetchall()
     cursor.close()
     
-    # Renderizar vista según el rol
     if rol == "alumno":
-        return render_template("recursos_alumno.html", recursos=recursos, usuario=session["usuario"])
+        return render_template("recursos_alumno.html", recursos=recursos)
     else:
         return render_template("recursos.html", recursos=recursos, rol=rol)
 
 
+    
+    # Solo admin, directivo, orientador y docente pueden agregar
 @app.route("/recursos/agregar", methods=["POST"])
 def agregar_recurso():
     if "usuario" not in session:
         return redirect(url_for("login"))
     
-    # Solo admin, directivo, orientador y docente pueden agregar
     if session["rol"] == "alumno":
         flash("No tienes permisos para agregar recursos", "error")
         return redirect(url_for("recursos"))
     
-    no_control = request.form["no_control"]
-    fecha = request.form["fecha"]
     nombre = request.form["nombre"]
     estadisticas = request.form["estadisticas"]
     materia = request.form["materia"]
     tipo = request.form["tipo"]
     
-    # Manejo del archivo
+    fecha = datetime.now()  # 👈 FECHA AUTOMÁTICA
+    
     if 'archivo' not in request.files:
         flash('No se seleccionó ningún archivo', 'error')
         return redirect(url_for('recursos'))
@@ -687,20 +685,21 @@ def agregar_recurso():
         flash('No se seleccionó ningún archivo', 'error')
         return redirect(url_for('recursos'))
         
-    if archivo:
-        filename = secure_filename(archivo.filename)
-        archivo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+    filename = secure_filename(archivo.filename)
+    archivo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         
-        cursor = conexion.cursor()
-        cursor.execute("""
-            INSERT INTO recursos (no_control, fecha, nombre, estadisticas, materia, tipo, archivo)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
-        """, (no_control, fecha, nombre, estadisticas, materia, tipo, filename))
-        conexion.commit()
-        cursor.close()
+    cursor = conexion.cursor()
+    cursor.execute("""
+        INSERT INTO recursos (fecha, nombre, estadisticas, materia, tipo, archivo)
+        VALUES (%s, %s, %s, %s, %s, %s)
+    """, (fecha, nombre, estadisticas, materia, tipo, filename))
+    
+    conexion.commit()
+    cursor.close()
 
-        flash("Recurso agregado correctamente", "info")
-        return redirect(url_for("recursos"))
+    flash("Recurso agregado correctamente", "info")
+    return redirect(url_for("recursos"))
+
 
 
 @app.route("/recursos/editar/<int:id>", methods=["GET", "POST"])
@@ -708,7 +707,6 @@ def editar_recurso(id):
     if "usuario" not in session:
         return redirect(url_for("login"))
     
-    # Solo admin, directivo, orientador y docente pueden editar
     if session["rol"] == "alumno":
         flash("No tienes permisos para editar recursos", "error")
         return redirect(url_for("recursos"))
@@ -716,16 +714,12 @@ def editar_recurso(id):
     cursor = conexion.cursor(dictionary=True)
 
     if request.method == "POST":
-        no_control = request.form["no_control"]
-        fecha = request.form["fecha"]
         nombre = request.form["nombre"]
         estadisticas = request.form["estadisticas"]
         materia = request.form["materia"]
         tipo = request.form["tipo"]
         
-        # Verificar si se subió un nuevo archivo
         archivo = request.files.get('archivo')
-        filename = None
         
         if archivo and archivo.filename != '':
             filename = secure_filename(archivo.filename)
@@ -733,16 +727,15 @@ def editar_recurso(id):
             
             cursor.execute("""
                 UPDATE recursos
-                SET no_control=%s, fecha=%s, nombre=%s, estadisticas=%s, materia=%s, tipo=%s, archivo=%s
+                SET nombre=%s, estadisticas=%s, materia=%s, tipo=%s, archivo=%s
                 WHERE id=%s
-            """, (no_control, fecha, nombre, estadisticas, materia, tipo, filename, id))
+            """, (nombre, estadisticas, materia, tipo, filename, id))
         else:
-            # Mantener el archivo anterior si no se sube uno nuevo
             cursor.execute("""
                 UPDATE recursos
-                SET no_control=%s, fecha=%s, nombre=%s, estadisticas=%s, materia=%s, tipo=%s
+                SET nombre=%s, estadisticas=%s, materia=%s, tipo=%s
                 WHERE id=%s
-            """, (no_control, fecha, nombre, estadisticas, materia, tipo, id))
+            """, (nombre, estadisticas, materia, tipo, id))
             
         conexion.commit()
         cursor.close()
@@ -753,6 +746,7 @@ def editar_recurso(id):
     recurso = cursor.fetchone()
     cursor.close()
     return render_template("editarrecursos.html", recurso=recurso)
+
 
 
 @app.route("/recursos/eliminar/<int:id>")
@@ -883,15 +877,14 @@ def reporte_general():
     elements.append(Spacer(1, 12))
     
     if recursos:
-        recursos_data = [['ID', 'No. Control', 'Nombre', 'Materia', 'Tipo', 'Fecha']]
+        recursos_data = [['ID', 'Nombre', 'Materia', 'Tipo', 'Fecha']]
         for r in recursos:
             recursos_data.append([
                 str(r['id']),
-                r['no_control'],
                 r['nombre'][:20],  # Limitar longitud
                 r['materia'][:15],
                 r['tipo'][:10],
-                str(r['fecha'])
+                str(r['fecha'][:25])
             ])
         
         recursos_table = Table(recursos_data, colWidths=[30, 70, 120, 90, 60, 70])

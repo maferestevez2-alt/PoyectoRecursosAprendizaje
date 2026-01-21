@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menú Docente</title>
+    <title>Menú Directivos</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='menu.css') }}">
 </head>
 <script>
@@ -38,7 +38,7 @@
         <div class="profile-initial">
             <div class="initial">{{ usuario[0]|upper }}</div>
             <h3>{{ usuario }}</h3>
-            <p>Docente</p>
+            <p>Directivo</p>
         </div>
 
         <ul>
@@ -53,7 +53,7 @@
 
     <div class="main-content">
         <h1>Bienvenido, {{ usuario }}</h1>
-        <h3>Rol: Docente</h3>
+        <h3>Rol: Directivo</h3>
 
         <div class="menu-grid">
             <div class="menu-card"><a href="/alumnos">Alumnos</a></div>
