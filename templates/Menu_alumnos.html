@@ -33,7 +33,7 @@
         <!-- Perfil de usuario -->
         <div class="profile">
             <img src="{{ url_for('static', filename='perfil.png') }}" alt="Foto de perfil">
-            <h3>{{ usuario }}</h3>
+            <h3>{{ nombre_completo }}</h3>
             <p>Alumno</p>
         </div>
 
@@ -43,7 +43,7 @@
     </div>
 
     <div class="main-content">
-        <h1>Bienvenido, {{ usuario }}</h1>
+        <h1>Bienvenido, {{ nombre_completo }}</h1>
         <h3>Rol: Alumno</h3>
 
         <div class="menu-grid">

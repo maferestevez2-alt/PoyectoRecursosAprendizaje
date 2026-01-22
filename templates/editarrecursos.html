@@ -13,12 +13,67 @@
     <h1>✏ Editar recurso</h1>
 
     <form method="POST" enctype="multipart/form-data">
-        <input type="text" name="no_control" value="{{ recurso.no_control }}" required>
-        <input type="date" name="fecha" value="{{ recurso.fecha }}" required>
-        <input type="text" name="nombre" value="{{ recurso.nombre }}" required>
-        <input type="text" name="estadisticas" value="{{ recurso.estadisticas }}" required>
-        <input type="text" name="materia" value="{{ recurso.materia }}" required>
-        <input type="text" name="tipo" value="{{ recurso.tipo }}" required>
+        <input type="text" name="nombre" value="{{ recurso.nombre }}" placeholder="Nombre" required>
+
+        <!-- Materia: dropdown for teachers, text input for other roles -->
+        {% if rol == 'docente' %}
+        <label for="materia">Materia:</label>
+        <select name="materia" id="materia" required>
+            <option value="">Selecciona una materia</option>
+            {% for materia in materias_docente %}
+            <option value="{{ materia }}" {% if recurso.materia==materia %}selected{% endif %}>{{ materia }}</option>
+            {% endfor %}
+        </select>
+        {% else %}
+        <input type="text" name="materia" value="{{ recurso.materia }}" placeholder="Materia" required>
+        {% endif %}
+
+        <!-- Tipo: dropdown with file types -->
+        <label for="tipo">Tipo de archivo:</label>
+        <select name="tipo" id="tipo" required>
+            <option value="">Selecciona tipo de archivo</option>
+            <option value="PowerPoint" {% if recurso.tipo=='PowerPoint' %}selected{% endif %}>PowerPoint</option>
+            <option value="Excel" {% if recurso.tipo=='Excel' %}selected{% endif %}>Excel</option>
+            <option value="Word" {% if recurso.tipo=='Word' %}selected{% endif %}>Word</option>
+            <option value="PDF" {% if recurso.tipo=='PDF' %}selected{% endif %}>PDF</option>
+            <option value="Imagen" {% if recurso.tipo=='Imagen' %}selected{% endif %}>Imagen</option>
+            <option value="Video" {% if recurso.tipo=='Video' %}selected{% endif %}>Video</option>
+            <option value="Otro" {% if recurso.tipo=='Otro' %}selected{% endif %}>Otro</option>
+        </select>
+
+        <!-- Dropdowns para filtrado -->
+        <label for="grupo">Grupo:</label>
+        <select name="grupo" id="grupo">
+            <option value="" {% if not recurso.grupo %}selected{% endif %}>Todos los grupos</option>
+            <option value="501" {% if recurso.grupo=='501' %}selected{% endif %}>501</option>
+            <option value="502" {% if recurso.grupo=='502' %}selected{% endif %}>502</option>
+            <option value="503" {% if recurso.grupo=='503' %}selected{% endif %}>503</option>
+            <option value="504" {% if recurso.grupo=='504' %}selected{% endif %}>504</option>
+            <option value="505" {% if recurso.grupo=='505' %}selected{% endif %}>505</option>
+            <option value="301" {% if recurso.grupo=='301' %}selected{% endif %}>301</option>
+            <option value="302" {% if recurso.grupo=='302' %}selected{% endif %}>302</option>
+            <option value="303" {% if recurso.grupo=='303' %}selected{% endif %}>303</option>
+            <option value="304" {% if recurso.grupo=='304' %}selected{% endif %}>304</option>
+            <option value="305" {% if recurso.grupo=='305' %}selected{% endif %}>305</option>
+        </select>
+
+        <label for="semestre">Semestre:</label>
+        <select name="semestre" id="semestre">
+            <option value="" {% if not recurso.semestre %}selected{% endif %}>Todos los semestres</option>
+            <option value="1" {% if recurso.semestre==1 %}selected{% endif %}>1</option>
+            <option value="2" {% if recurso.semestre==2 %}selected{% endif %}>2</option>
+            <option value="3" {% if recurso.semestre==3 %}selected{% endif %}>3</option>
+            <option value="4" {% if recurso.semestre==4 %}selected{% endif %}>4</option>
+            <option value="5" {% if recurso.semestre==5 %}selected{% endif %}>5</option>
+            <option value="6" {% if recurso.semestre==6 %}selected{% endif %}>6</option>
+        </select>
+
+        <label for="turno">Turno:</label>
+        <select name="turno" id="turno">
+            <option value="" {% if not recurso.turno %}selected{% endif %}>Todos los turnos</option>
+            <option value="Matutino" {% if recurso.turno=='Matutino' %}selected{% endif %}>Matutino</option>
+            <option value="Vespertino" {% if recurso.turno=='Vespertino' %}selected{% endif %}>Vespertino</option>
+        </select>
 
         <label for="archivo">Archivo actual: {{ recurso.archivo }}</label><br>
         <label for="archivo">Subir nuevo archivo (opcional):</label>

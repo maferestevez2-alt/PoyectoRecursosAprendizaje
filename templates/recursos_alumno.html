@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <title>Recursos - Alumno</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='proyecto.css') }}">
 
 </head>
+
 <body>
 
     <div class="header-section">
@@ -38,9 +40,6 @@
             <div class="recurso-info">
                 <strong> Fecha:</strong> {{ r.fecha }}
             </div>
-            <div class="recurso-info">
-                <strong>Estadísticas:</strong> {{ r.estadisticas }}
-            </div>
             <a href="/recursos/descargar/{{ r.id }}" class="btn-descargar">
                 📥 Descargar Recurso
             </a>
@@ -58,27 +57,28 @@
         </a>
     </div>
 
-<script>
-function buscarVoz(){
-    if (!('webkitSpeechRecognition' in window)) {
-        alert("Tu navegador no soporta reconocimiento de voz");
-        return;
-    }
+    <script>
+        function buscarVoz() {
+            if (!('webkitSpeechRecognition' in window)) {
+                alert("Tu navegador no soporta reconocimiento de voz");
+                return;
+            }
 
-    let reconocimiento = new webkitSpeechRecognition();
-    reconocimiento.lang = "es-MX";
-    reconocimiento.continuous = false;
-    reconocimiento.interimResults = false;
+            let reconocimiento = new webkitSpeechRecognition();
+            reconocimiento.lang = "es-MX";
+            reconocimiento.continuous = false;
+            reconocimiento.interimResults = false;
 
-    reconocimiento.start();
+            reconocimiento.start();
 
-    reconocimiento.onresult = function(event){
-        const texto = event.results[0][0].transcript;
-        document.querySelector("input[name='busqueda']").value = texto;
-        document.querySelector("form").submit();
-    };
-}
-</script>
+            reconocimiento.onresult = function (event) {
+                const texto = event.results[0][0].transcript;
+                document.querySelector("input[name='busqueda']").value = texto;
+                document.querySelector("form").submit();
+            };
+        }
+    </script>
 
 </body>
+
 </html>

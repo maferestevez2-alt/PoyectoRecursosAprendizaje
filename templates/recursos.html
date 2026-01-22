@@ -31,9 +31,67 @@
     <h3>➕ Agregar recurso</h3>
     <form method="POST" action="/recursos/agregar" enctype="multipart/form-data">
         <input type="text" name="nombre" placeholder="Nombre" required>
-        <input type="text" name="estadisticas" placeholder="Estadísticas" required>
+
+        <!-- Materia: dropdown for teachers, text input for other roles -->
+        {% if rol == 'docente' %}
+        <label for="materia">Materia:</label>
+        <select name="materia" id="materia" required>
+            <option value="">Selecciona una materia</option>
+            {% for materia in materias_docente %}
+            <option value="{{ materia }}">{{ materia }}</option>
+            {% endfor %}
+        </select>
+        {% else %}
         <input type="text" name="materia" placeholder="Materia" required>
-        <input type="text" name="tipo" placeholder="Tipo" required>
+        {% endif %}
+
+        <!-- Tipo: dropdown with file types -->
+        <label for="tipo">Tipo de archivo:</label>
+        <select name="tipo" id="tipo" required>
+            <option value="">Selecciona tipo de archivo</option>
+            <option value="PowerPoint">PowerPoint</option>
+            <option value="Excel">Excel</option>
+            <option value="Word">Word</option>
+            <option value="PDF">PDF</option>
+            <option value="Imagen">Imagen</option>
+            <option value="Video">Video</option>
+            <option value="Otro">Otro</option>
+        </select>
+
+        <!-- Dropdowns para filtrado -->
+        <label for="grupo">Grupo:</label>
+        <select name="grupo" id="grupo">
+            <option value="">Todos los grupos</option>
+            <option value="501">501</option>
+            <option value="502">502</option>
+            <option value="503">503</option>
+            <option value="504">504</option>
+            <option value="505">505</option>
+            <option value="301">301</option>
+            <option value="302">302</option>
+            <option value="303">303</option>
+            <option value="304">304</option>
+            <option value="305">305</option>
+        </select>
+
+        <label for="semestre">Semestre:</label>
+        <select name="semestre" id="semestre">
+            <option value="">Todos los semestres</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+        </select>
+
+        <label for="turno">Turno:</label>
+        <select name="turno" id="turno">
+            <option value="">Todos los turnos</option>
+            <option value="Matutino">Matutino</option>
+            <option value="Vespertino">Vespertino</option>
+        </select>
+
         <label for="archivo">Archivo del recurso:</label>
         <input type="file" name="archivo" required>
         <button type="submit">Agregar</button>
@@ -44,7 +102,6 @@
             <th>ID</th>
             <th>Fecha</th>
             <th>Nombre</th>
-            <th>Estadísticas</th>
             <th>Materia</th>
             <th>Tipo</th>
             <th>Acciones</th>
@@ -55,7 +112,6 @@
             <td>{{ r.id }}</td>
             <td>{{ r.fecha }}</td>
             <td>{{ r.nombre }}</td>
-            <td>{{ r.estadisticas }}</td>
             <td>{{ r.materia }}</td>
             <td>{{ r.tipo }}</td>
             <td>

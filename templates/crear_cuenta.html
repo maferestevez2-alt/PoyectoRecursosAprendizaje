@@ -5,21 +5,32 @@
     <meta charset="UTF-8">
     <title>Crear Cuenta</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='crear_cuenta.css') }}">
+    <style>
+        .form-group {
+            display: none;
+        }
+
+        .form-group.active {
+            display: block;
+        }
+
+        .info-box {
+            background-color: #e7f3ff;
+            border: 1px solid #2196F3;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+    </style>
 </head>
 
 <body>
 
     <h2>Crear cuenta nueva</h2>
 
-    <form method="POST">
-        <label>Usuario:</label>
-        <input type="text" name="usuario" required>
-
-        <label>Contraseña:</label>
-        <input type="password" name="password" required>
-
+    <form method="POST" id="createAccountForm">
         <label>Rol:</label>
-        <select name="rol" required>
+        <select name="rol" id="rolSelect" required onchange="mostrarFormulario()">
             <option value="">Selecciona</option>
             <option value="admin">Admin</option>
             <option value="directivo">Directivo</option>
@@ -27,6 +38,116 @@
             <option value="docente">Docente</option>
             <option value="alumno">Alumno</option>
         </select>
+
+        <!-- Formulario para Admin -->
+        <div id="formAdmin" class="form-group">
+            <label>Usuario:</label>
+            <input type="text" name="usuario">
+
+            <label>Contraseña:</label>
+            <input type="password" name="password">
+        </div>
+
+        <!-- Formulario para Alumno -->
+        <div id="formAlumno" class="form-group">
+            <div class="info-box">
+                ℹ️ <strong>Nota:</strong> Tu usuario será tu <strong>número de control</strong> y tu contraseña será tu
+                <strong>CURP</strong>.
+            </div>
+
+            <label>No. Control:</label>
+            <input type="text" name="no_control" placeholder="No. Control">
+
+            <label>CURP:</label>
+            <input type="text" name="curp" placeholder="CURP">
+
+            <label>Nombre:</label>
+            <input type="text" name="nombre" placeholder="Nombre">
+
+            <label>Apellido Paterno:</label>
+            <input type="text" name="apellido_paterno" placeholder="Apellido Paterno">
+
+            <label>Apellido Materno:</label>
+            <input type="text" name="apellido_materno" placeholder="Apellido Materno">
+
+            <label>Grupo:</label>
+            <input type="text" name="grupo" placeholder="Grupo">
+
+            <label>Turno:</label>
+            <input type="text" name="turno" placeholder="Turno">
+
+            <label>Semestre:</label>
+            <input type="text" name="semestre" placeholder="Semestre">
+        </div>
+
+        <!-- Formulario para Docente -->
+        <div id="formDocente" class="form-group">
+            <div class="info-box">
+                ℹ️ <strong>Nota:</strong> Tu usuario será tu <strong>número de empleado</strong> y se generará una
+                contraseña de 8 dígitos automáticamente.
+            </div>
+
+            <label>No. Empleado:</label>
+            <input type="text" name="no_empleado" placeholder="No. Empleado">
+
+            <label>Nombre:</label>
+            <input type="text" name="nombre" placeholder="Nombre">
+
+            <label>Apellido Paterno:</label>
+            <input type="text" name="apellido_paterno" placeholder="Apellido Paterno">
+
+            <label>Apellido Materno:</label>
+            <input type="text" name="apellido_materno" placeholder="Apellido Materno">
+
+            <label>Materia:</label>
+            <input type="text" name="materia" placeholder="Materia">
+        </div>
+
+        <!-- Formulario para Orientador -->
+        <div id="formOrientador" class="form-group">
+            <div class="info-box">
+                ℹ️ <strong>Nota:</strong> Tu usuario será tu <strong>número de empleado</strong> y se generará una
+                contraseña de 8 dígitos automáticamente.
+            </div>
+
+            <label>No. Empleado:</label>
+            <input type="text" name="no_empleado" placeholder="No. Empleado">
+
+            <label>Nombre:</label>
+            <input type="text" name="nombre" placeholder="Nombre">
+
+            <label>Apellido Paterno:</label>
+            <input type="text" name="apellido_paterno" placeholder="Apellido Paterno">
+
+            <label>Apellido Materno:</label>
+            <input type="text" name="apellido_materno" placeholder="Apellido Materno">
+
+            <label>Grupos Encargado:</label>
+            <input type="text" name="grupos_encargado" placeholder="Grupos Encargado">
+        </div>
+
+        <!-- Formulario para Directivo -->
+        <div id="formDirectivo" class="form-group">
+            <div class="info-box">
+                ℹ️ <strong>Nota:</strong> Tu usuario será tu <strong>número de empleado</strong> y se generará una
+                contraseña de 8 dígitos automáticamente.
+            </div>
+
+            <label>No. Empleado:</label>
+            <input type="text" name="no_empleado" placeholder="No. Empleado">
+
+            <label>Nombre:</label>
+            <input type="text" name="nombre" placeholder="Nombre">
+
+            <label>Apellido Paterno:</label>
+            <input type="text" name="apellido_paterno" placeholder="Apellido Paterno">
+
+            <label>Apellido Materno:</label>
+            <input type="text" name="apellido_materno" placeholder="Apellido Materno">
+
+            <label>Puesto:</label>
+            <input type="text" name="puesto" placeholder="Puesto">
+        </div>
 
         <button type="submit">Crear cuenta</button>
         <a href="{{ url_for('login') }}">Regresar</a>
@@ -41,6 +162,46 @@
     </ul>
     {% endif %}
     {% endwith %}
+
+    <script>
+        function mostrarFormulario() {
+            const rol = document.getElementById('rolSelect').value;
+            const forms = document.querySelectorAll('.form-group');
+
+            // Ocultar todos los formularios
+            forms.forEach(form => {
+                form.classList.remove('active');
+                // Desactivar required en campos ocultos
+                form.querySelectorAll('input').forEach(input => {
+                    input.removeAttribute('required');
+                });
+            });
+
+            // Mostrar el formulario correspondiente
+            let activeForm = null;
+            if (rol === 'admin') {
+                activeForm = document.getElementById('formAdmin');
+            } else if (rol === 'alumno') {
+                activeForm = document.getElementById('formAlumno');
+            } else if (rol === 'docente') {
+                activeForm = document.getElementById('formDocente');
+            } else if (rol === 'orientador') {
+                activeForm = document.getElementById('formOrientador');
+            } else if (rol === 'directivo') {
+                activeForm = document.getElementById('formDirectivo');
+            }
+
+            if (activeForm) {
+                activeForm.classList.add('active');
+                // Activar required en campos visibles
+                activeForm.querySelectorAll('input').forEach(input => {
+                    if (input.type !== 'password' || rol === 'admin') {
+                        input.setAttribute('required', 'required');
+                    }
+                });
+            }
+        }
+    </script>
 
 </body>
 

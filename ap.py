@@ -3,6 +3,7 @@ import mysql.connector
 from flask import Flask, render_template, request, redirect, url_for, session, flash, send_file
 import mysql.connector
 import os
+import random
 from werkzeug.utils import secure_filename
 from io import BytesIO
 from reportlab.lib.pagesizes import letter
@@ -107,6 +108,10 @@ def clear_login_attempts(usuario):
     conexion.commit()
     cursor.close()
 
+def generar_password_8digitos():
+    """Genera una contraseña aleatoria de 8 dígitos"""
+    return ''.join([str(random.randint(0, 9)) for _ in range(8)])
+
 # ==============================================================
 #                      LOGIN / CUENTAS
 # ==============================================================
@@ -124,16 +129,90 @@ def login():
             return render_template("login.html")
 
         cursor = conexion.cursor(dictionary=True)
-        # Buscar usuario solo por nombre de usuario (sin rol)
-        cursor.execute("SELECT * FROM usuarios WHERE usuario=%s", (usuario,))
-        user = cursor.fetchone()
+        user = None
+        rol = None
+        nombre_completo = None
+        perfil_id = None
+        
+        # Intentar login como ALUMNO (usuario: no_control, password: curp)
+        cursor.execute("SELECT * FROM alumnos WHERE no_control=%s", (usuario,))
+        alumno = cursor.fetchone()
+        
+        if alumno and alumno["curp"] == password:
+            user = alumno
+            rol = "alumno"
+            nombre_completo = f"{alumno['nombre']} {alumno['apellido_paterno']} {alumno['apellido_materno']}"
+            perfil_id = alumno['id']
+        
+        # Si no es alumno, intentar login como DOCENTE 
+        # (usuario: nombre apellido_paterno apellido_materno, password: no_empleado)
+        if not user:
+            cursor.execute("SELECT * FROM docentes")
+            docentes = cursor.fetchall()
+            
+            for docente in docentes:
+                nombre_usuario = f"{docente['nombre']} {docente['apellido_paterno']} {docente['apellido_materno']}"
+                if nombre_usuario.lower() == usuario.lower() and docente["no_empleado"] == password:
+                    user = docente
+                    rol = "docente"
+                    nombre_completo = nombre_usuario
+                    perfil_id = docente['id']
+                    break
+        
+        # Si no es docente, intentar login como ORIENTADOR
+        # (usuario: nombre apellido_paterno apellido_materno, password: no_empleado)
+        if not user:
+            cursor.execute("SELECT * FROM orientadores")
+            orientadores = cursor.fetchall()
+            
+            for orientador in orientadores:
+                nombre_usuario = f"{orientador['nombre']} {orientador['apellido_paterno']} {orientador['apellido_materno']}"
+                if nombre_usuario.lower() == usuario.lower() and orientador["no_empleado"] == password:
+                    user = orientador
+                    rol = "orientador"
+                    nombre_completo = nombre_usuario
+                    perfil_id = orientador['id']
+                    break
+        
+        # Si no es orientador, intentar login como DIRECTIVO
+        # (usuario: nombre apellido_paterno apellido_materno, password: no_empleado)
+        if not user:
+            cursor.execute("SELECT * FROM directivos")
+            directivos = cursor.fetchall()
+            
+            for directivo in directivos:
+                nombre_usuario = f"{directivo['nombre']} {directivo['apellido_paterno']} {directivo['apellido_materno']}"
+                if nombre_usuario.lower() == usuario.lower() and directivo["no_empleado"] == password:
+                    user = directivo
+                    rol = "directivo"
+                    nombre_completo = nombre_usuario
+                    perfil_id = directivo['id']
+                    break
+        
+        # Si no es ninguno de los anteriores, intentar login como ADMIN (tabla usuarios)
+        if not user:
+            cursor.execute("SELECT * FROM usuarios WHERE usuario=%s AND rol='admin'", (usuario,))
+            admin = cursor.fetchone()
+            
+            if admin and admin["password"] == password:
+                user = admin
+                rol = "admin"
+                nombre_completo = admin.get("nombre_completo", usuario)
+                perfil_id = admin.get("perfil_id")
+        
         cursor.close()
 
-        if user and user["password"] == password: 
+        # Si se encontró un usuario válido
+        if user and rol:
             # Login exitoso - limpiar intentos fallidos
             clear_login_attempts(usuario)
             session["usuario"] = usuario
-            session["rol"] = user["rol"]  # Obtener rol automáticamente de la base de datos
+            session["rol"] = rol
+            session["nombre_completo"] = nombre_completo
+            
+            if perfil_id:
+                session["perfil_id"] = perfil_id
+            
             return redirect(url_for("menu"))
         else:
             # Login fallido - registrar intento
@@ -152,21 +231,137 @@ def login():
 @app.route("/crear_cuenta", methods=["GET", "POST"])
 def crear_cuenta():
     if request.method == "POST":
-        usuario = request.form["usuario"]
-        password = request.form["password"]
         rol = request.form["rol"]
-
         cursor = conexion.cursor()
-        cursor.execute("SELECT * FROM usuarios WHERE usuario=%s", (usuario,))
-        if cursor.fetchone():
-            flash("El usuario ya existe", "error")
-        else:
-            cursor.execute("INSERT INTO usuarios (usuario, password, rol) VALUES (%s, %s, %s)",
-                           (usuario, password, rol))
-            conexion.commit()
-            flash("Cuenta creada correctamente", "info")
+        
+        try:
+            if rol == "alumno":
+                # Para alumnos: usar campos del formulario de agregar alumno
+                no_control = request.form['no_control']
+                curp = request.form['curp']
+                nombre = request.form['nombre']
+                apellido_paterno = request.form['apellido_paterno']
+                apellido_materno = request.form['apellido_materno']
+                grupo = request.form['grupo']
+                turno = request.form['turno']
+                semestre = request.form['semestre']
+                
+                # Verificar si el alumno ya existe
+                cursor.execute("SELECT * FROM alumnos WHERE no_control=%s", (no_control,))
+                if cursor.fetchone():
+                    flash("El alumno ya existe", "error")
+                    cursor.close()
+                    return render_template("crear_cuenta.html")
+                
+                # Insertar en tabla alumnos
+                cursor.execute("""
+                    INSERT INTO alumnos (no_control, curp, nombre, apellido_paterno, apellido_materno, grupo, turno, semestre)
+                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
+                """, (no_control, curp, nombre, apellido_paterno, apellido_materno, grupo, turno, semestre))
+                
+                conexion.commit()
+                flash(f"Cuenta de alumno creada correctamente. Usuario: {no_control}, Contraseña: {curp}", "success")
+                
+            elif rol == "docente":
+                # Para docentes
+                no_empleado = request.form['no_empleado']
+                nombre = request.form['nombre']
+                apellido_paterno = request.form['apellido_paterno']
+                apellido_materno = request.form['apellido_materno']
+                materia = request.form['materia']
+                
+                nombre_completo = f"{nombre} {apellido_paterno} {apellido_materno}"
+                
+                # Verificar si el docente ya existe
+                cursor.execute("SELECT * FROM docentes WHERE no_empleado=%s", (no_empleado,))
+                if cursor.fetchone():
+                    flash("El docente ya existe", "error")
+                    cursor.close()
+                    return render_template("crear_cuenta.html")
+                
+                # Insertar en tabla docentes
+                cursor.execute("""
+                    INSERT INTO docentes (no_empleado, nombre, apellido_paterno, apellido_materno, materia)
+                    VALUES (%s, %s, %s, %s, %s)
+                """, (no_empleado, nombre, apellido_paterno, apellido_materno, materia))
+                
+                conexion.commit()
+                flash(f"Cuenta de docente creada correctamente. Usuario: {nombre_completo}, Contraseña: {no_empleado}", "success")
+                
+            elif rol == "orientador":
+                # Para orientadores
+                no_empleado = request.form['no_empleado']
+                nombre = request.form['nombre']
+                apellido_paterno = request.form['apellido_paterno']
+                apellido_materno = request.form['apellido_materno']
+                grupos_encargado = request.form['grupos_encargado']
+                
+                nombre_completo = f"{nombre} {apellido_paterno} {apellido_materno}"
+                
+                # Verificar si el orientador ya existe
+                cursor.execute("SELECT * FROM orientadores WHERE no_empleado=%s", (no_empleado,))
+                if cursor.fetchone():
+                    flash("El orientador ya existe", "error")
+                    cursor.close()
+                    return render_template("crear_cuenta.html")
+                
+                # Insertar en tabla orientadores
+                cursor.execute("""
+                    INSERT INTO orientadores (no_empleado, nombre, apellido_paterno, apellido_materno, grupos_encargado)
+                    VALUES (%s, %s, %s, %s, %s)
+                """, (no_empleado, nombre, apellido_paterno, apellido_materno, grupos_encargado))
+                
+                conexion.commit()
+                flash(f"Cuenta de orientador creada correctamente. Usuario: {nombre_completo}, Contraseña: {no_empleado}", "success")
+                
+            elif rol == "directivo":
+                # Para directivos
+                no_empleado = request.form['no_empleado']
+                nombre = request.form['nombre']
+                apellido_paterno = request.form['apellido_paterno']
+                apellido_materno = request.form['apellido_materno']
+                puesto = request.form['puesto']
+                
+                nombre_completo = f"{nombre} {apellido_paterno} {apellido_materno}"
+                
+                # Verificar si el directivo ya existe
+                cursor.execute("SELECT * FROM directivos WHERE no_empleado=%s", (no_empleado,))
+                if cursor.fetchone():
+                    flash("El directivo ya existe", "error")
+                    cursor.close()
+                    return render_template("crear_cuenta.html")
+                
+                # Insertar en tabla directivos
+                cursor.execute("""
+                    INSERT INTO directivos (no_empleado, nombre, apellido_paterno, apellido_materno, puesto)
+                    VALUES (%s, %s, %s, %s, %s)
+                """, (no_empleado, nombre, apellido_paterno, apellido_materno, puesto))
+                
+                conexion.commit()
+                flash(f"Cuenta de directivo creada correctamente. Usuario: {nombre_completo}, Contraseña: {no_empleado}", "success")
+                
+            else:
+                # Para admin, mantener el método original
+                usuario = request.form["usuario"]
+                password = request.form["password"]
+                
+                cursor.execute("SELECT * FROM usuarios WHERE usuario=%s", (usuario,))
+                if cursor.fetchone():
+                    flash("El usuario ya existe", "error")
+                else:
+                    cursor.execute("INSERT INTO usuarios (usuario, password, rol) VALUES (%s, %s, %s)",
+                                   (usuario, password, rol))
+                    conexion.commit()
+                    flash("Cuenta creada correctamente", "info")
+                    
+            cursor.close()
             return redirect(url_for("login"))
-        cursor.close()
+            
+        except Exception as e:
+            conexion.rollback()
+            cursor.close()
+            flash(f"Error al crear la cuenta: {str(e)}", "error")
+            return render_template("crear_cuenta.html")
 
     return render_template("crear_cuenta.html")
 
@@ -178,23 +373,69 @@ def recuperar_contrasena():
         nueva_password = request.form["password"]
 
         cursor = conexion.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM usuarios WHERE usuario=%s", (usuario,))
-        user = cursor.fetchone()
-
-        if user:
-            cursor.execute(
-                "UPDATE usuarios SET password=%s WHERE usuario=%s",
-                (nueva_password, usuario)
-            )
+        actualizado = False
+        
+        # Intentar actualizar en tabla alumnos (password es curp)
+        cursor.execute("SELECT * FROM alumnos WHERE no_control=%s", (usuario,))
+        if cursor.fetchone():
+            cursor.execute("UPDATE alumnos SET curp=%s WHERE no_control=%s", (nueva_password, usuario))
             conexion.commit()
-            cursor.close()
+            actualizado = True
+        
+        # Si no es alumno, buscar por nombre completo en docentes
+        if not actualizado:
+            cursor.execute("SELECT * FROM docentes")
+            docentes = cursor.fetchall()
+            for docente in docentes:
+                nombre_usuario = f"{docente['nombre']} {docente['apellido_paterno']} {docente['apellido_materno']}"
+                if nombre_usuario.lower() == usuario.lower():
+                    cursor.execute("UPDATE docentes SET no_empleado=%s WHERE id=%s", (nueva_password, docente['id']))
+                    conexion.commit()
+                    actualizado = True
+                    break
+        
+        # Si no es docente, buscar en orientadores
+        if not actualizado:
+            cursor.execute("SELECT * FROM orientadores")
+            orientadores = cursor.fetchall()
+            for orientador in orientadores:
+                nombre_usuario = f"{orientador['nombre']} {orientador['apellido_paterno']} {orientador['apellido_materno']}"
+                if nombre_usuario.lower() == usuario.lower():
+                    cursor.execute("UPDATE orientadores SET no_empleado=%s WHERE id=%s", (nueva_password, orientador['id']))
+                    conexion.commit()
+                    actualizado = True
+                    break
+        
+        # Si no es orientador, buscar en directivos
+        if not actualizado:
+            cursor.execute("SELECT * FROM directivos")
+            directivos = cursor.fetchall()
+            for directivo in directivos:
+                nombre_usuario = f"{directivo['nombre']} {directivo['apellido_paterno']} {directivo['apellido_materno']}"
+                if nombre_usuario.lower() == usuario.lower():
+                    cursor.execute("UPDATE directivos SET no_empleado=%s WHERE id=%s", (nueva_password, directivo['id']))
+                    conexion.commit()
+                    actualizado = True
+                    break
+        
+        # Si no es ninguno de los anteriores, buscar en usuarios (admin)
+        if not actualizado:
+            cursor.execute("SELECT * FROM usuarios WHERE usuario=%s", (usuario,))
+            if cursor.fetchone():
+                cursor.execute("UPDATE usuarios SET password=%s WHERE usuario=%s", (nueva_password, usuario))
+                conexion.commit()
+                actualizado = True
+        
+        cursor.close()
+        
+        if actualizado:
             flash("Contraseña actualizada correctamente", "success")
             return redirect(url_for("login"))
         else:
-            cursor.close()
             flash("El usuario no existe", "error")
 
     return render_template("recuperar_contrasena.html")
+
 
 @app.route("/menu")
 def menu():
@@ -202,18 +443,19 @@ def menu():
         return redirect(url_for("login"))
     
     rol = session["rol"]
+    nombre_completo = session.get("nombre_completo", session["usuario"])
     
     # Redirigir a cada menú según el rol
     if rol == "admin":
-        return render_template("menu_admin.html", usuario=session["usuario"], rol=rol)
+        return render_template("menu_admin.html", usuario=session["usuario"], rol=rol, nombre_completo=nombre_completo)
     elif rol == "directivo":
-        return render_template("menu_directivo.html", usuario=session["usuario"], rol=rol)
+        return render_template("menu_directivo.html", usuario=session["usuario"], rol=rol, nombre_completo=nombre_completo)
     elif rol == "orientador":
-        return render_template("menu_orientador.html", usuario=session["usuario"], rol=rol)
+        return render_template("menu_orientador.html", usuario=session["usuario"], rol=rol, nombre_completo=nombre_completo)
     elif rol == "docente":
-        return render_template("menu_docente.html", usuario=session["usuario"], rol=rol)
+        return render_template("menu_docente.html", usuario=session["usuario"], rol=rol, nombre_completo=nombre_completo)
     elif rol == "alumno":
-        return render_template("menu_alumnos.html", usuario=session["usuario"], rol=rol)
+        return render_template("menu_alumnos.html", usuario=session["usuario"], rol=rol, nombre_completo=nombre_completo)
     else:
         return redirect(url_for("login"))
 
@@ -249,23 +491,50 @@ def alumnos():
 
 @app.route("/alumnos/agregar", methods=["POST"])
 def agregar_alumno():
-    data = (
-        request.form['no_control'],
-        request.form['curp'],
-        request.form['nombre'],
-        request.form['apellido_paterno'],
-        request.form['apellido_materno'],
-        request.form['grupo'],
-        request.form['turno'],
-        request.form['semestre']
-    )
+    no_control = request.form['no_control']
+    curp = request.form['curp']
+    nombre = request.form['nombre']
+    apellido_paterno = request.form['apellido_paterno']
+    apellido_materno = request.form['apellido_materno']
+    grupo = request.form['grupo']
+    turno = request.form['turno']
+    semestre = request.form['semestre']
+    
     cursor = conexion.cursor()
-    cursor.execute("""
-        INSERT INTO alumnos (no_control, curp, nombre, apellido_paterno, apellido_materno, grupo, turno, semestre)
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
-    """, data)
-    conexion.commit()
-    cursor.close()
+    
+    try:
+        # Verificar si el usuario ya existe
+        cursor.execute("SELECT * FROM usuarios WHERE usuario=%s", (no_control,))
+        if cursor.fetchone():
+            flash("El número de control ya existe como usuario", "error")
+            cursor.close()
+            return redirect(url_for("alumnos"))
+        
+        # Insertar en tabla alumnos
+        cursor.execute("""
+            INSERT INTO alumnos (no_control, curp, nombre, apellido_paterno, apellido_materno, grupo, turno, semestre)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
+        """, (no_control, curp, nombre, apellido_paterno, apellido_materno, grupo, turno, semestre))
+        
+        # Obtener el ID del alumno recién insertado
+        alumno_id = cursor.lastrowid
+        
+        # Crear usuario automáticamente
+        nombre_completo = f"{nombre} {apellido_paterno} {apellido_materno}"
+        cursor.execute("""
+            INSERT INTO usuarios (usuario, password, rol, nombre_completo, perfil_id) 
+            VALUES (%s, %s, %s, %s, %s)
+        """, (no_control, curp, 'alumno', nombre_completo, alumno_id))
+        
+        conexion.commit()
+        flash(f"Alumno agregado correctamente. Usuario creado: {no_control}", "success")
+        
+    except Exception as e:
+        conexion.rollback()
+        flash(f"Error al agregar alumno: {str(e)}", "error")
+    finally:
+        cursor.close()
+    
     return redirect(url_for("alumnos"))
 
 @app.route("/logout_inactivity", methods=["POST"])
@@ -334,20 +603,50 @@ def docentes():
 
 @app.route("/docentes/agregar", methods=["POST"])
 def agregar_docente():
+    no_empleado = request.form["no_empleado"]
+    nombre = request.form["nombre"]
+    apellido_paterno = request.form["apellido_paterno"]
+    apellido_materno = request.form["apellido_materno"]
+    materia = request.form["materia"]
+    
     cursor = conexion.cursor()
-    cursor.execute("""
-        INSERT INTO docentes (no_empleado, nombre, apellido_paterno, apellido_materno, materia)
-        VALUES (%s, %s, %s, %s, %s)
-    """, (
-        request.form["no_empleado"],
-        request.form["nombre"],
-        request.form["apellido_paterno"],
-        request.form["apellido_materno"],
-        request.form["materia"]
-    ))
-    conexion.commit()
-    cursor.close()
-    flash("Docente agregado correctamente")
+    
+    try:
+        # Verificar si el usuario ya existe
+        cursor.execute("SELECT * FROM usuarios WHERE usuario=%s", (no_empleado,))
+        if cursor.fetchone():
+            flash("El número de empleado ya existe como usuario", "error")
+            cursor.close()
+            return redirect(url_for("docentes"))
+        
+        # Insertar en tabla docentes
+        cursor.execute("""
+            INSERT INTO docentes (no_empleado, nombre, apellido_paterno, apellido_materno, materia)
+            VALUES (%s, %s, %s, %s, %s)
+        """, (no_empleado, nombre, apellido_paterno, apellido_materno, materia))
+        
+        # Obtener el ID del docente recién insertado
+        docente_id = cursor.lastrowid
+        
+        # Generar contraseña de 8 dígitos
+        password = generar_password_8digitos()
+        
+        # Crear usuario automáticamente
+        nombre_completo = f"{nombre} {apellido_paterno} {apellido_materno}"
+        cursor.execute("""
+            INSERT INTO usuarios (usuario, password, rol, nombre_completo, perfil_id) 
+            VALUES (%s, %s, %s, %s, %s)
+        """, (no_empleado, password, 'docente', nombre_completo, docente_id))
+        
+        conexion.commit()
+        flash(f"Docente agregado correctamente. Usuario: {no_empleado}, Contraseña: {password}", "success")
+        
+    except Exception as e:
+        conexion.rollback()
+        flash(f"Error al agregar docente: {str(e)}", "error")
+    finally:
+        cursor.close()
+    
     return redirect(url_for("docentes"))
 
 
@@ -409,20 +708,50 @@ def orientadores():
 
 @app.route("/orientadores/agregar", methods=["POST"])
 def agregar_orientador():
+    no_empleado = request.form["no_empleado"]
+    nombre = request.form["nombre"]
+    apellido_paterno = request.form["apellido_paterno"]
+    apellido_materno = request.form["apellido_materno"]
+    grupos_encargado = request.form["grupos_encargado"]
+    
     cursor = conexion.cursor()
-    cursor.execute("""
-        INSERT INTO orientadores (nombre, apellido_paterno, apellido_materno, telefono, correo)
-        VALUES (%s, %s, %s, %s, %s)
-    """, (
-        request.form["nombre"],
-        request.form["apellido_paterno"],
-        request.form["apellido_materno"],
-        request.form["telefono"],
-        request.form["correo"]
-    ))
-    conexion.commit()
-    cursor.close()
-    flash("Orientador agregado correctamente")
+    
+    try:
+        # Verificar si el usuario ya existe
+        cursor.execute("SELECT * FROM usuarios WHERE usuario=%s", (no_empleado,))
+        if cursor.fetchone():
+            flash("El número de empleado ya existe como usuario", "error")
+            cursor.close()
+            return redirect(url_for("orientadores"))
+        
+        # Insertar en tabla orientadores
+        cursor.execute("""
+            INSERT INTO orientadores (no_empleado, nombre, apellido_paterno, apellido_materno, grupos_encargado)
+            VALUES (%s, %s, %s, %s, %s)
+        """, (no_empleado, nombre, apellido_paterno, apellido_materno, grupos_encargado))
+        
+        # Obtener el ID del orientador recién insertado
+        orientador_id = cursor.lastrowid
+        
+        # Generar contraseña de 8 dígitos
+        password = generar_password_8digitos()
+        
+        # Crear usuario automáticamente
+        nombre_completo = f"{nombre} {apellido_paterno} {apellido_materno}"
+        cursor.execute("""
+            INSERT INTO usuarios (usuario, password, rol, nombre_completo, perfil_id) 
+            VALUES (%s, %s, %s, %s, %s)
+        """, (no_empleado, password, 'orientador', nombre_completo, orientador_id))
+        
+        conexion.commit()
+        flash(f"Orientador agregado correctamente. Usuario: {no_empleado}, Contraseña: {password}", "success")
+        
+    except Exception as e:
+        conexion.rollback()
+        flash(f"Error al agregar orientador: {str(e)}", "error")
+    finally:
+        cursor.close()
+    
     return redirect(url_for("orientadores"))
 
 
@@ -485,20 +814,50 @@ def directivos():
 
 @app.route("/directivos/agregar", methods=["POST"])
 def agregar_directivo():
+    no_empleado = request.form["no_empleado"]
+    nombre = request.form["nombre"]
+    apellido_paterno = request.form["apellido_paterno"]
+    apellido_materno = request.form["apellido_materno"]
+    puesto = request.form["puesto"]
+    
     cursor = conexion.cursor()
-    cursor.execute("""
-        INSERT INTO directivos (nombre, apellido_paterno, apellido_materno, cargo, correo)
-        VALUES (%s, %s, %s, %s, %s)
-    """, (
-        request.form["nombre"],
-        request.form["apellido_paterno"],
-        request.form["apellido_materno"],
-        request.form["cargo"],
-        request.form["correo"]
-    ))
-    conexion.commit()
-    cursor.close()
-    flash("Directivo agregado correctamente")
+    
+    try:
+        # Verificar si el usuario ya existe
+        cursor.execute("SELECT * FROM usuarios WHERE usuario=%s", (no_empleado,))
+        if cursor.fetchone():
+            flash("El número de empleado ya existe como usuario", "error")
+            cursor.close()
+            return redirect(url_for("directivos"))
+        
+        # Insertar en tabla directivos
+        cursor.execute("""
+            INSERT INTO directivos (no_empleado, nombre, apellido_paterno, apellido_materno, puesto)
+            VALUES (%s, %s, %s, %s, %s)
+        """, (no_empleado, nombre, apellido_paterno, apellido_materno, puesto))
+        
+        # Obtener el ID del directivo recién insertado
+        directivo_id = cursor.lastrowid
+        
+        # Generar contraseña de 8 dígitos
+        password = generar_password_8digitos()
+        
+        # Crear usuario automáticamente
+        nombre_completo = f"{nombre} {apellido_paterno} {apellido_materno}"
+        cursor.execute("""
+            INSERT INTO usuarios (usuario, password, rol, nombre_completo, perfil_id) 
+            VALUES (%s, %s, %s, %s, %s)
+        """, (no_empleado, password, 'directivo', nombre_completo, directivo_id))
+        
+        conexion.commit()
+        flash(f"Directivo agregado correctamente. Usuario: {no_empleado}, Contraseña: {password}", "success")
+        
+    except Exception as e:
+        conexion.rollback()
+        flash(f"Error al agregar directivo: {str(e)}", "error")
+    finally:
+        cursor.close()
+    
     return redirect(url_for("directivos"))
 
 
@@ -646,18 +1005,58 @@ def recursos():
             OR tipo LIKE %s
         """, (f"%{busqueda}%", f"%{busqueda}%", f"%{busqueda}%"))
     else:
-        cursor.execute("SELECT * FROM recursos")
+        # Si es alumno, filtrar recursos por su grupo, semestre y turno
+        if rol == "alumno":
+            # Obtener el perfil del alumno
+            perfil_id = session.get("perfil_id")
+            if perfil_id:
+                cursor.execute("SELECT grupo, semestre, turno FROM alumnos WHERE id=%s", (perfil_id,))
+                alumno = cursor.fetchone()
+                
+                if alumno:
+                    # Filtrar recursos: mostrar los que coincidan O los que no tienen filtros (generales)
+                    cursor.execute("""
+                        SELECT * FROM recursos 
+                        WHERE (grupo IS NULL OR grupo = '' OR grupo = %s)
+                        AND (semestre IS NULL OR semestre = '' OR semestre = %s)
+                        AND (turno IS NULL OR turno = '' OR turno = %s)
+                    """, (alumno['grupo'], alumno['semestre'], alumno['turno']))
+                else:
+                    cursor.execute("SELECT * FROM recursos")
+            else:
+                cursor.execute("SELECT * FROM recursos")
+        else:
+            # Para otros roles, mostrar todos los recursos
+            cursor.execute("SELECT * FROM recursos")
 
     recursos = cursor.fetchall()
+    
+    # Obtener materias asignadas del docente si es docente
+    materias_docente = []
+    if rol == "docente":
+        perfil_id = session.get("perfil_id")
+        if perfil_id:
+            # Primero obtener el no_empleado del docente
+            cursor.execute("SELECT no_empleado FROM docentes WHERE id = %s", (perfil_id,))
+            docente_data = cursor.fetchone()
+            if docente_data and docente_data['no_empleado']:
+                # Luego obtener las materias asignadas usando no_empleado
+                cursor.execute("""
+                    SELECT DISTINCT nombre_materia 
+                    FROM materias_asignadas 
+                    WHERE no_empleado = %s
+                    ORDER BY nombre_materia
+                """, (docente_data['no_empleado'],))
+                materias_docente = [m['nombre_materia'] for m in cursor.fetchall()]
+    
     cursor.close()
     
     if rol == "alumno":
         return render_template("recursos_alumno.html", recursos=recursos)
     else:
-        return render_template("recursos.html", recursos=recursos, rol=rol)
+        return render_template("recursos.html", recursos=recursos, rol=rol, materias_docente=materias_docente)
 
 
-    
     # Solo admin, directivo, orientador y docente pueden agregar
 @app.route("/recursos/agregar", methods=["POST"])
 def agregar_recurso():
@@ -669,9 +1068,11 @@ def agregar_recurso():
         return redirect(url_for("recursos"))
     
     nombre = request.form["nombre"]
-    estadisticas = request.form["estadisticas"]
     materia = request.form["materia"]
     tipo = request.form["tipo"]
+    grupo = request.form.get("grupo", "") or None  # Empty string becomes None
+    semestre = request.form.get("semestre", "") or None
+    turno = request.form.get("turno", "") or None
     
     fecha = datetime.now()  # 👈 FECHA AUTOMÁTICA
     
@@ -690,9 +1091,9 @@ def agregar_recurso():
         
     cursor = conexion.cursor()
     cursor.execute("""
-        INSERT INTO recursos (fecha, nombre, estadisticas, materia, tipo, archivo)
-        VALUES (%s, %s, %s, %s, %s, %s)
-    """, (fecha, nombre, estadisticas, materia, tipo, filename))
+        INSERT INTO recursos (fecha, nombre, materia, tipo, archivo, grupo, semestre, turno)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+    """, (fecha, nombre, materia, tipo, filename, grupo, semestre, turno))
     
     conexion.commit()
     cursor.close()
@@ -715,9 +1116,11 @@ def editar_recurso(id):
 
     if request.method == "POST":
         nombre = request.form["nombre"]
-        estadisticas = request.form["estadisticas"]
         materia = request.form["materia"]
         tipo = request.form["tipo"]
+        grupo = request.form.get("grupo", "") or None
+        semestre = request.form.get("semestre", "") or None
+        turno = request.form.get("turno", "") or None
         
         archivo = request.files.get('archivo')
         
@@ -727,15 +1130,15 @@ def editar_recurso(id):
             
             cursor.execute("""
                 UPDATE recursos
-                SET nombre=%s, estadisticas=%s, materia=%s, tipo=%s, archivo=%s
+                SET nombre=%s, materia=%s, tipo=%s, archivo=%s, grupo=%s, semestre=%s, turno=%s
                 WHERE id=%s
-            """, (nombre, estadisticas, materia, tipo, filename, id))
+            """, (nombre, materia, tipo, filename, grupo, semestre, turno, id))
         else:
             cursor.execute("""
                 UPDATE recursos
-                SET nombre=%s, estadisticas=%s, materia=%s, tipo=%s
+                SET nombre=%s, materia=%s, tipo=%s, grupo=%s, semestre=%s, turno=%s
                 WHERE id=%s
-            """, (nombre, estadisticas, materia, tipo, id))
+            """, (nombre, materia, tipo, grupo, semestre, turno, id))
             
         conexion.commit()
         cursor.close()
@@ -744,8 +1147,27 @@ def editar_recurso(id):
 
     cursor.execute("SELECT * FROM recursos WHERE id=%s", (id,))
     recurso = cursor.fetchone()
+    
+    # Obtener materias asignadas del docente si es docente
+    materias_docente = []
+    if session["rol"] == "docente":
+        perfil_id = session.get("perfil_id")
+        if perfil_id:
+            # Primero obtener el no_empleado del docente
+            cursor.execute("SELECT no_empleado FROM docentes WHERE id = %s", (perfil_id,))
+            docente_data = cursor.fetchone()
+            if docente_data and docente_data['no_empleado']:
+                # Luego obtener las materias asignadas usando no_empleado
+                cursor.execute("""
+                    SELECT DISTINCT nombre_materia 
+                    FROM materias_asignadas 
+                    WHERE no_empleado = %s
+                    ORDER BY nombre_materia
+                """, (docente_data['no_empleado'],))
+                materias_docente = [m['nombre_materia'] for m in cursor.fetchall()]
+    
     cursor.close()
-    return render_template("editarrecursos.html", recurso=recurso)
+    return render_template("editarrecursos.html", recurso=recurso, rol=session["rol"], materias_docente=materias_docente)
 
 
 
@@ -884,7 +1306,7 @@ def reporte_general():
                 r['nombre'][:20],  # Limitar longitud
                 r['materia'][:15],
                 r['tipo'][:10],
-                str(r['fecha'][:25])
+                str(r['fecha'])
             ])
         
         recursos_table = Table(recursos_data, colWidths=[30, 70, 120, 90, 60, 70])
