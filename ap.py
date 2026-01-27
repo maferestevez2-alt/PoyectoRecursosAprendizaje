@@ -742,17 +742,27 @@ def ver_visualizaciones_docente(id_recurso):
     ultima = cursor.fetchone()["ultima"]
     cursor.close()
 
-    # 🔹 USUARIOS (UNA SOLA VEZ POR USUARIO)
+    # 🔹 TODAS LAS VISUALIZACIONES (CADA VEZ QUE UN USUARIO VIO EL RECURSO)
     cursor = conexion.cursor(dictionary=True)
     cursor.execute("""
         SELECT
-            u.nombre_completo,
-            MAX(v.fecha) AS fecha
+            COALESCE(
+                u.nombre_completo,
+                CONCAT(a.nombre, ' ', a.apellido_paterno, ' ', a.apellido_materno),
+                CONCAT(d.nombre, ' ', d.apellido_paterno, ' ', d.apellido_materno),
+                CONCAT(o.nombre, ' ', o.apellido_paterno, ' ', o.apellido_materno),
+                CONCAT(dir.nombre, ' ', dir.apellido_paterno, ' ', dir.apellido_materno),
+                v.usuario
+            ) AS nombre_completo,
+            v.fecha
         FROM visualizaciones v
-        JOIN usuarios u ON v.usuario = u.usuario
+        LEFT JOIN usuarios u ON v.usuario = u.usuario
+        LEFT JOIN alumnos a ON v.usuario = a.no_control
+        LEFT JOIN docentes d ON v.usuario = d.no_empleado
+        LEFT JOIN orientadores o ON v.usuario = o.no_empleado
+        LEFT JOIN directivos dir ON v.usuario = dir.no_empleado
         WHERE v.id_recurso = %s
-        GROUP BY v.usuario, u.nombre_completo
-        ORDER BY fecha DESC
+        ORDER BY v.fecha DESC
     """, (id_recurso,))
     visualizaciones = cursor.fetchall()
     cursor.close()
@@ -780,10 +790,21 @@ def reporte_visualizaciones(id_recurso):
     # Reporte general con nombre completo del usuario
     cursor.execute("""
         SELECT 
-            u.nombre_completo,
+            COALESCE(
+                u.nombre_completo,
+                CONCAT(a.nombre, ' ', a.apellido_paterno, ' ', a.apellido_materno),
+                CONCAT(d.nombre, ' ', d.apellido_paterno, ' ', d.apellido_materno),
+                CONCAT(o.nombre, ' ', o.apellido_paterno, ' ', o.apellido_materno),
+                CONCAT(dir.nombre, ' ', dir.apellido_paterno, ' ', dir.apellido_materno),
+                v.usuario
+            ) AS nombre_completo,
             v.fecha
         FROM visualizaciones v
-        JOIN usuarios u ON v.id_usuario = u.id_usuario
+        LEFT JOIN usuarios u ON v.usuario = u.usuario
+        LEFT JOIN alumnos a ON v.usuario = a.no_control
+        LEFT JOIN docentes d ON v.usuario = d.no_empleado
+        LEFT JOIN orientadores o ON v.usuario = o.no_empleado
+        LEFT JOIN directivos dir ON v.usuario = dir.no_empleado
         WHERE v.id_recurso = %s
         ORDER BY v.fecha DESC
     """, (id_recurso,))
@@ -799,7 +820,7 @@ def reporte_visualizaciones(id_recurso):
     total = cursor.fetchone()["total"]
 
     cursor.execute("""
-        SELECT COUNT(DISTINCT id_usuario) AS usuarios_unicos
+        SELECT COUNT(DISTINCT usuario) AS usuarios_unicos
         FROM visualizaciones
         WHERE id_recurso = %s
     """, (id_recurso,))
