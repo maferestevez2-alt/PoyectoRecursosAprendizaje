@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Recursos - Alumno</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='proyecto.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='visualizar.css') }}">
 
 </head>
 
@@ -25,37 +25,35 @@
         </form>
     </div>
 
-    <!-- GRID DE RECURSOS -->
-    {% if recursos %}
-    <div class="recursos-grid">
-        {% for r in recursos %}
-        <div class="recurso-card">
-            <h3>{{ r.nombre }}</h3>
-            <div class="recurso-info">
-                <strong> Materia:</strong> {{ r.materia }}
-            </div>
-            <div class="recurso-info">
-                <strong> Tipo:</strong> {{ r.tipo }}
-            </div>
-            <div class="recurso-info">
-                <strong> Fecha:</strong> {{ r.fecha }}
-            </div>
-            <a href="/recursos/descargar/{{ r.id }}" class="btn-descargar">
-                📥 Descargar Recurso
-            </a>
-        </div>
-        {% endfor %}
-    </div>
-    {% else %}
-    <div class="no-recursos">
-        <p>📭 No hay recursos disponibles en este momento.</p>
-    </div>
-    {% endif %}
 
     <div style="margin-top: 30px; text-align: center;">
         <a href="{{ url_for('menu') }}">← Volver al menú
         </a>
     </div>
+       <table>
+        <tr>
+            <th>ID</th>
+            <th>Fecha</th>
+            <th>Nombre</th>
+            <th>Materia</th>
+            <th>Tipo</th>
+            <th>Acciones</th>
+        </tr>
+
+        {% for r in recursos %}
+        <tr>
+            <td>{{ r.id }}</td>
+            <td>{{ r.fecha }}</td>
+            <td>{{ r.nombre }}</td>
+            <td>{{ r.materia }}</td>
+            <td>{{ r.tipo }}</td>
+            <td>
+                <a href="/recursos/descargar/{{ r.id }}" style="color: #3498db;">📥 Descargar</a>
+                <a href="/recursos/visualizar/{{ r.id }}" style="color: #3498db;">Visualizar</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
 
     <script>
         function buscarVoz() {

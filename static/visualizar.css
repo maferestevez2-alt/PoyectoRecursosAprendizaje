@@ -1,0 +1,177 @@
+/* =============================
+   RESET BÁSICO
+==============================*/
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", sans-serif;
+}
+
+/* =============================
+   GENERAL
+==============================*/
+body {
+    background: linear-gradient(
+        135deg,
+        #eaf2ff 0%,
+        #ffffff 100%
+    );
+    color: #003366;
+    padding: 20px;
+}
+
+h1, h2 {
+    text-align: center;
+    margin-bottom: 15px;
+    color: #003366;
+}
+
+/* =============================
+    FORMULARIOS
+==============================*/
+form {
+    background: #ffffff;
+    border: 2px solid #005bbb;
+    padding: 18px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 650px;
+    margin: 20px auto;
+    box-shadow: 0 10px 25px rgba(68, 155, 248, 0.685);
+}
+
+form input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 12px;
+    border: 1px solid #0077dd;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+form input:focus {
+    outline: none;
+    border: 2px solid #003366;
+}
+
+/* BOTÓN FORM */
+button {
+    width: 30%;
+    padding: 12px;
+    background: linear-gradient(
+        135deg,
+        #005bbb,
+        #003366
+    );
+    border: none;
+    border-radius: 10px;
+    color: #ffffff;
+    font-size: 15px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: transform 0.2s, opacity 0.2s;
+}
+
+button:hover {
+    transform: scale(1.04);
+    opacity: 0.9;
+}
+
+/* =============================
+   TABLA
+==============================*/
+table {
+    width: 90%;
+    max-width: 900px;
+    margin: 25px auto;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 12px 30px rgba(91, 166, 247, 0.856);
+}
+
+th, td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #569ff3;
+}
+
+th {
+    background: linear-gradient(
+        135deg,
+        #005bbb,
+        #003366
+    );
+    color: white;
+}
+
+tr:nth-child(even) {
+    background: #f1f7ff;
+}
+
+tr:hover {
+    background: #dce9ff;
+}
+
+/* =============================
+   BOTONES EN TABLA
+==============================*/
+a {
+    text-decoration: none;
+    color: rgb(59, 51, 216);
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-weight: bold;
+    display: inline-block;
+    transition: transform 0.2s, opacity 0.2s;
+}
+
+a:hover {
+    transform: scale(1.05);
+    opacity: 0.9;
+}
+
+a[href*='editar'] {
+    padding: 5px 13px;
+    background: linear-gradient(
+        135deg,
+        #0077dd,
+        #005bbb
+    );
+}
+
+a[href*='eliminar'] {
+    padding: 5px 5px;
+    background: linear-gradient(
+        135deg,
+        #e74c3c,
+        #c0392b
+    );
+}
+a[href*='menu' ]{
+    padding: 10px 20px; 
+    background: #192e7be2;
+    color: white; 
+    text-decoration: none; 
+    border-radius: 5px;
+
+}
+
+/* =============================
+   BOTÓN REGRESAR
+==============================*/
+.volver {
+    display: block;
+    margin: 25px auto;
+    width: 140px;
+    text-align: center;
+    background: linear-gradient(
+        135deg,
+        #0077dd,
+        #549adf
+    );
+    padding: 10px;
+    border-radius: 10px;
+}

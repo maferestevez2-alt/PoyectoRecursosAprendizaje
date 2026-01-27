@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizar Recurso</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='visualizar.css') }}">
+</head>
+<body>
+
+<div class="visor-container">
+    <div class="header">
+        <h2>📄 Visualización del Recurso</h2>
+        <div class="descripcion">
+            Estás visualizando: <strong>{{ archivo }}</strong>
+        </div>
+    </div>
+
+    <div class="visor">
+        {% if extension == '.pdf' %}
+            <!-- PDF -->
+            <iframe src="{{ url_for('ver_archivo', filename=archivo) }}" width="100%" height="600px"></iframe>
+        
+        {% elif extension in ['.doc', '.docx'] %}
+            <!-- Documentos Word -->
+            <iframe 
+                src="https://view.officeapps.live.com/op/embed.aspx?src={{ request.url_root }}{{ url_for('ver_archivo', filename=archivo) }}" 
+                width="100%" 
+                height="600px">
+            </iframe>
+        
+        {% elif extension in ['.ppt', '.pptx'] %}
+            <!-- Presentaciones PowerPoint -->
+            <iframe 
+                src="https://view.officeapps.live.com/op/embed.aspx?src={{ request.url_root }}{{ url_for('ver_archivo', filename=archivo) }}" 
+                width="100%" 
+                height="600px">
+            </iframe>
+        
+        {% elif extension in ['.xls', '.xlsx'] %}
+            <!-- Hojas de cálculo Excel -->
+            <iframe 
+                src="https://view.officeapps.live.com/op/embed.aspx?src={{ request.url_root }}{{ url_for('ver_archivo', filename=archivo) }}" 
+                width="100%" 
+                height="600px">
+            </iframe>
+        
+        {% elif extension in ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp', '.svg'] %}
+            <!-- Imágenes -->
+            <img src="{{ url_for('ver_archivo', filename=archivo) }}" alt="{{ archivo }}">
+        
+        {% elif extension in ['.mp4', '.webm', '.ogg', '.mov', '.avi'] %}
+            <!-- Videos -->
+            <div class="video-container">
+                <video controls>
+                    <source src="{{ url_for('ver_archivo', filename=archivo) }}" type="video/{{ extension[1:] }}">
+                    Tu navegador no soporta la reproducción de video.
+                </video>
+            </div>
+        
+        {% elif extension in ['.mp3', '.wav', '.ogg', '.m4a'] %}
+            <!-- Audio -->
+            <div class="audio-container">
+                <div class="file-icon">🎵</div>
+                <audio controls>
+                    <source src="{{ url_for('ver_archivo', filename=archivo) }}" type="audio/{{ extension[1:] }}">
+                    Tu navegador no soporta la reproducción de audio.
+                </audio>
+            </div>
+        
+        {% elif extension == '.txt' %}
+            <!-- Archivos de texto -->
+            <iframe src="{{ url_for('ver_archivo', filename=archivo) }}" width="100%" height="600px" style="background: white;"></iframe>
+        
+        {% else %}
+            <!-- Sin vista previa -->
+            <div class="no-preview">
+                <div class="file-icon">📎</div>
+                <p>No hay vista previa disponible para este tipo de archivo ({{ extension }})</p>
+                <a href="{{ url_for('ver_archivo', filename=archivo) }}" class="btn" download>
+                    ⬇️ Descargar archivo
+                </a>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="acciones">
+        <a href="{{ url_for('recursos') }}" class="btn">← Volver a recursos</a>
+        <a href="{{ url_for('ver_archivo', filename=archivo) }}" class="btn" download style="margin-left: 10px;">
+            ⬇️ Descargar
+        </a>
+    </div>
+</div>
+
+</body>
+</html>

@@ -685,6 +685,37 @@ def eliminar_docente(id):
     flash("Docente eliminado correctamente")
     return redirect(url_for("docentes"))
 
+@app.route("/docente/visualizaciones/<int:id_recurso>")
+def ver_visualizaciones_docente(id_recurso):
+    if session.get("rol") != "docente":
+        abort(403)
+
+    cursor = conexion.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT usuario, fecha
+        FROM visualizaciones
+        WHERE id_recurso = %s
+        ORDER BY fecha DESC
+    """, (id_recurso,))
+    vistos = cursor.fetchall()
+
+    cursor.execute("""
+        SELECT COUNT(*) AS total
+        FROM visualizaciones
+        WHERE id_recurso = %s
+    """, (id_recurso,))
+    total = cursor.fetchone()["total"]
+
+    cursor.close()
+
+    return render_template(
+        "visualizaciones_docente.html",
+        vistos=vistos,
+        total=total
+    )
+
+
 # ==============================================================
 #                      CRUD: ORIENTADORES
 # ==============================================================
@@ -1213,6 +1244,69 @@ def descargar_recurso(id):
     except FileNotFoundError:
         flash("El archivo físico no se encuentra en el servidor", "error")
         return redirect(url_for("recursos"))
+    
+from flask import send_file, abort
+import os
+
+#######################################################################
+#                 VISUALIZAR RECURSO
+########################################################################
+import os  # Asegúrate de tener este import al inicio del archivo
+from flask import render_template, redirect, url_for, session, abort, send_from_directory
+
+@app.route("/recursos/visualizar/<int:id>")
+def visualizar_recurso(id):
+    """Muestra la página de visualización del recurso"""
+    if "usuario" not in session:
+        return redirect(url_for("login"))
+
+    cursor = conexion.cursor(dictionary=True)
+
+    # Obtener recurso
+    cursor.execute("""
+        SELECT id, fecha, nombre, estadisticas, materia, tipo,
+               archivo, grupo, semestre, turno
+        FROM recursos 
+        WHERE id = %s
+    """, (id,))
+    recurso = cursor.fetchone()
+
+    if not recurso:
+        cursor.close()
+        abort(404)
+
+    # 🔹 REGISTRAR VISUALIZACIÓN (AQUÍ SE AGREGA)
+    try:
+        cursor.execute("""
+            INSERT INTO visualizaciones (id_recurso, usuario)
+            VALUES (%s, %s)
+        """, (id, session["usuario"]))
+        conexion.commit()
+    except:
+        # Si ya existe (por UNIQUE), no pasa nada
+        pass
+
+    cursor.close()
+
+    nombre_archivo = recurso["archivo"]
+    extension = os.path.splitext(nombre_archivo)[1].lower()
+
+    return render_template(
+        "visualizar_recurso.html",
+        recurso=recurso,
+        archivo=nombre_archivo,
+        extension=extension,
+        id=id
+    )
+
+@app.route("/ver_archivo/<filename>")
+def ver_archivo(filename):
+    base_dir = os.path.abspath(os.path.dirname(__file__))
+    uploads_path = os.path.join(base_dir, app.config['UPLOAD_FOLDER'])
+
+    print(f"Buscando archivo en: {uploads_path}/{filename}")
+
+    return send_from_directory(uploads_path, filename)
 
 
 # ==============================================================
