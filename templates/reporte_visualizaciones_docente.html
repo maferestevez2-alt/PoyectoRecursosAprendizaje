@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reporte General de Visualizaciones</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            color: #000;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        p {
+            margin: 4px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .btn-imprimir {
+            background-color: #007BFF;
+            color: white;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .btn-imprimir:hover {
+            background-color: #0056b3;
+        }
+
+        .volver {
+            display: inline-block;
+            margin-top: 15px;
+            text-decoration: none;
+            color: #007BFF;
+            font-weight: bold;
+        }
+
+        /* 🔴 OCULTAR ELEMENTOS AL IMPRIMIR */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+
+            body {
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<h2>📊 Reporte General de Usuarios que Visualizaron el Recurso</h2>
+
+<p><strong>Total de visualizaciones:</strong> {{ total }}</p>
+<p><strong>Usuarios únicos:</strong> {{ usuarios_unicos }}</p>
+<p><strong>Última visualización:</strong> {{ ultima or "Sin registros" }}</p>
+
+<hr>
+
+{% if visualizaciones %}
+<table>
+    <thead>
+        <tr>
+            <th>Nombre completo del usuario</th>
+            <th>Fecha de visualización</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for v in visualizaciones %}
+        <tr>
+            <td>{{ v.nombre_completo }}</td>
+            <td>{{ v.fecha }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No hay registros de visualización.</p>
+{% endif %}
+
+<br>
+
+<!-- 🔽 NO SE IMPRIME -->
+<div class="no-print">
+    <button class="btn-imprimir" onclick="window.print()">
+        🖨️ Imprimir reporte
+    </button>
+    <br><br>
+    <a href="{{ url_for('menu') }}" class="volver">← Volver</a>
+</div>
+
+</body>
+</html>

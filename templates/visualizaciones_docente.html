@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Visualizaciones del recurso</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='visualizar_docentes.css') }}">
+</head>
+
+<body>
+
+    <h2>📊 Estadísticas del recurso</h2>
+
+    <div class="kpis">
+        <div class="kpi">
+            👁 Total vistas
+            <b>{{ total }}</b>
+        </div>
+
+        <div class="kpi">
+            👥 Usuarios únicos
+            <b>{{ usuarios_unicos }}</b>
+        </div>
+
+        <div class="kpi">
+            📅 Hoy
+            <b>{{ hoy }}</b>
+        </div>
+
+        <div class="kpi">
+            📆 Esta semana
+            <b>{{ semana }}</b>
+        </div>
+
+        <div class="kpi">
+            ⏰ Última vista
+            <b>{{ ultima or "Sin vistas" }}</b>
+        </div>
+        <button class="btn-imprimir" onclick="window.print()">
+        🖨️ Imprimir reporte
+    </button>
+    </div>
+
+    <h2>👀 Usuarios que visualizaron el recurso</h2>
+
+    {% if visualizaciones %}
+    <table>
+        <tr>
+            <th>Nombre del usuario</th>
+            <th>Fecha de visualización</th>
+        </tr>
+
+        {% for v in visualizaciones %}
+        <tr>
+            <td>{{ v.nombre_completo }}</td>
+            <td>{{ v.fecha }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+        <p>No hay visualizaciones registradas.</p>
+    {% endif %}
+
+    <a href="{{ url_for('menu') }}">← Volver</a>
+
+</body>
+</html>

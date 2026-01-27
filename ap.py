@@ -690,16 +690,107 @@ def ver_visualizaciones_docente(id_recurso):
     if session.get("rol") != "docente":
         abort(403)
 
+    # 🔹 KPI TOTAL
     cursor = conexion.cursor(dictionary=True)
-
     cursor.execute("""
-        SELECT usuario, fecha
+        SELECT COUNT(*) AS total
         FROM visualizaciones
         WHERE id_recurso = %s
+    """, (id_recurso,))
+    total = cursor.fetchone()["total"]
+    cursor.close()
+
+    # 🔹 KPI USUARIOS ÚNICOS
+    cursor = conexion.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT COUNT(DISTINCT usuario) AS usuarios_unicos
+        FROM visualizaciones
+        WHERE id_recurso = %s
+    """, (id_recurso,))
+    usuarios_unicos = cursor.fetchone()["usuarios_unicos"]
+    cursor.close()
+
+    # 🔹 KPI HOY
+    cursor = conexion.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT COUNT(*) AS hoy
+        FROM visualizaciones
+        WHERE id_recurso = %s
+        AND DATE(fecha) = CURDATE()
+    """, (id_recurso,))
+    hoy = cursor.fetchone()["hoy"]
+    cursor.close()
+
+    # 🔹 KPI SEMANA
+    cursor = conexion.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT COUNT(*) AS semana
+        FROM visualizaciones
+        WHERE id_recurso = %s
+        AND YEARWEEK(fecha, 1) = YEARWEEK(CURDATE(), 1)
+    """, (id_recurso,))
+    semana = cursor.fetchone()["semana"]
+    cursor.close()
+
+    # 🔹 KPI ÚLTIMA
+    cursor = conexion.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT MAX(fecha) AS ultima
+        FROM visualizaciones
+        WHERE id_recurso = %s
+    """, (id_recurso,))
+    ultima = cursor.fetchone()["ultima"]
+    cursor.close()
+
+    # 🔹 USUARIOS (UNA SOLA VEZ POR USUARIO)
+    cursor = conexion.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT
+            u.nombre_completo,
+            MAX(v.fecha) AS fecha
+        FROM visualizaciones v
+        JOIN usuarios u ON v.usuario = u.usuario
+        WHERE v.id_recurso = %s
+        GROUP BY v.usuario, u.nombre_completo
         ORDER BY fecha DESC
     """, (id_recurso,))
-    vistos = cursor.fetchall()
+    visualizaciones = cursor.fetchall()
+    cursor.close()
 
+    return render_template(
+        "visualizaciones_docente.html",
+        total=total,
+        usuarios_unicos=usuarios_unicos,
+        hoy=hoy,
+        semana=semana,
+        ultima=ultima,
+        visualizaciones=visualizaciones
+    )
+
+###########################################################################
+#                      REPORTE GENERAL DE VISUALIZACION                   #
+###########################################################################
+@app.route("/docente/reporte/visualizaciones/<int:id_recurso>")
+def reporte_visualizaciones(id_recurso):
+    if session.get("rol") != "docente":
+        abort(403)
+
+    cursor = conexion.cursor(dictionary=True)
+
+    # Reporte general con nombre completo del usuario
+    cursor.execute("""
+        SELECT 
+            u.nombre_completo,
+            v.fecha
+        FROM visualizaciones v
+        JOIN usuarios u ON v.id_usuario = u.id_usuario
+        WHERE v.id_recurso = %s
+        ORDER BY v.fecha DESC
+    """, (id_recurso,))
+
+    visualizaciones = cursor.fetchall()
+
+    # KPIs
     cursor.execute("""
         SELECT COUNT(*) AS total
         FROM visualizaciones
@@ -707,12 +798,28 @@ def ver_visualizaciones_docente(id_recurso):
     """, (id_recurso,))
     total = cursor.fetchone()["total"]
 
+    cursor.execute("""
+        SELECT COUNT(DISTINCT id_usuario) AS usuarios_unicos
+        FROM visualizaciones
+        WHERE id_recurso = %s
+    """, (id_recurso,))
+    usuarios_unicos = cursor.fetchone()["usuarios_unicos"]
+
+    cursor.execute("""
+        SELECT MAX(fecha) AS ultima
+        FROM visualizaciones
+        WHERE id_recurso = %s
+    """, (id_recurso,))
+    ultima = cursor.fetchone()["ultima"]
+
     cursor.close()
 
     return render_template(
-        "visualizaciones_docente.html",
-        vistos=vistos,
-        total=total
+        "reporte_visualizaciones_docente.html",
+        visualizaciones=visualizaciones,
+        total=total,
+        usuarios_unicos=usuarios_unicos,
+        ultima=ultima
     )
 
 
@@ -1245,9 +1352,6 @@ def descargar_recurso(id):
         flash("El archivo físico no se encuentra en el servidor", "error")
         return redirect(url_for("recursos"))
     
-from flask import send_file, abort
-import os
-
 #######################################################################
 #                 VISUALIZAR RECURSO
 ########################################################################

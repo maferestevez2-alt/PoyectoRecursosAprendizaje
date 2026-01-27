@@ -118,13 +118,14 @@
                 <a href="/recursos/descargar/{{ r.id }}" style="color: #3498db;">📥 Descargar</a>
                 <a href="/recursos/editar/{{ r.id }}">✏ Editar</a>
                 <a href="/recursos/eliminar/{{ r.id }}" onclick="return confirm('¿Estás seguro?')">🗑 Eliminar</a>
+                <a href="/docente/visualizaciones/{{ r.id }}" style="color: #3498db;">📊 Ver Usuarios</a>
             </td>
         </tr>
         {% endfor %}
     </table>
 
     <div style="margin-top: 30px;">
-        <a href="{{ url_for('menu') }}">←Volver al menú</a>
+        <a href="{{ url_for('recursos') }}">←Volver al menú</a>
     </div>
 
     <script>

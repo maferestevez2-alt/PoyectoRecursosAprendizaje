@@ -1,0 +1,136 @@
+/* =============================
+   RESET BÁSICO
+==============================*/
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", sans-serif;
+}
+
+/* =============================
+   GENERAL
+==============================*/
+body {
+    background: linear-gradient(
+        135deg,
+        #eaf2ff 0%,
+        #ffffff 100%
+    );
+    color: #003366;
+    padding: 20px;
+}
+
+/* =============================
+   TÍTULOS
+==============================*/
+h2 {
+    text-align: center;
+    margin: 20px 0 15px;
+    color: #003366;
+    font-size: 24px;
+}
+
+/* =============================
+   KPIs
+==============================*/
+.kpis {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin: 25px auto;
+}
+
+.kpi {
+    background: #ffffff;
+    border: 2px solid #005bbb;
+    border-radius: 14px;
+    padding: 18px;
+    width: 180px;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(68, 155, 248, 0.685);
+    font-size: 14px;
+}
+
+.kpi b {
+    display: block;
+    margin-top: 6px;
+    font-size: 22px;
+    color: #003366;
+}
+
+
+/* =============================
+   TABLA
+==============================*/
+table {
+    width: 90%;
+    max-width: 900px;
+    margin: 25px auto;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 12px 30px rgba(91, 166, 247, 0.856);
+}
+
+th, td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #569ff3;
+}
+
+th {
+    background: linear-gradient(
+        135deg,
+        #005bbb,
+        #003366
+    );
+    color: white;
+    font-weight: bold;
+}
+
+tr:nth-child(even) {
+    background: #f1f7ff;
+}
+
+tr:hover {
+    background: #dce9ff;
+}
+
+/* =============================
+   MENSAJE SIN DATOS
+==============================*/
+p {
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+    color: #005bbb;
+    margin-top: 20px;
+}
+
+/* =============================
+   BOTÓN VOLVER
+==============================*/
+a {
+    display: block;
+    margin: 30px auto;
+    width: fit-content;
+    padding: 10px 24px;
+    background: linear-gradient(
+        135deg,
+        #0077dd,
+        #003366
+    );
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    font-weight: bold;
+    transition: transform 0.2s, opacity 0.2s;
+}
+
+a:hover {
+    transform: scale(1.05);
+    opacity: 0.9;
+}
